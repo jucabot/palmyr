@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% load breadcrumbs %}
+
+{% block style %}
+<style type="text/css">
+      #folders .span2 {
+		text-align: center;
+      }
+ 	#folders .p {
+		font-size: 130%;
+      }
+    #submit_file {
+    	margin: 20px;
+    }
+    
+    </style>
+{% endblock %}
+{% block content %}
+	
+	<h1>My data sources</h1>
+	
+	{{ path|breadcrumb }}
+	
+	<div id="message"></div>
+	
+		  <div class="row-fluid">
+			    <div class="span12">
+			      	<div class="span7" ></div>
+					<div class="span5">
+						<div class="pull-right">
+						<button class="btn btn-primary" href="#upload-file" role="button" data-toggle="modal">Upload file</button>
+						<button class="btn" href="#create-folder" role="button" data-toggle="modal">Create folder...</button>
+						<div class="btn-group" data-toggle="buttons-checkbox">
+							  <button type="button" class="btn"><i class="icon-th-large" title="Display as icons"></i></button>
+							  <button type="button" class="btn"><i class="icon-th-list" title="Display as list"></i></button>
+						</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>	
+	
+	<div class="row-fluid" id="folders">
+	  	<div class="span12">
+	  		{% if path = "/" %}
+		 	<div class="span2" ><a href="#marketplace"><img src="{{ STATIC_PREFIX }}/img/marketplace.png" /></a>
+	  		<p>Marketplace</p>
+	  		</div>
+	  		
+	  		<div class="span2" ><a href="#examples"><img src="{{ STATIC_PREFIX }}/img/sharedfolder.png" /></a>
+	  		<p>Shared folder</p>
+	  		</div>
+	  		
+			{% endif %}
+		 	
+		 	{% for dir in directories %}
+	  		<div class="span2" >
+	  			<a href="?path={{ path }}/{{ dir }}"><img src="{{ STATIC_PREFIX }}/img/folder.png" /></a>
+	  			<p>{{ dir }} <i class="icon-remove" title="remove"></i></p>
+	  		</div>
+			{% endfor %}
+			
+			{% for file in files %}
+		  		<div class="span2"><a href="{% url 'create-analysis' %}?dpath={{ path }}/{{ file }}"><img src="{{ STATIC_PREFIX }}/img/file.png" /></a>
+	  			<p>{{ file }} <i class="icon-remove" title="remove"></i></p></div>
+			{% endfor %}
+			
+		
+		</div>
+	
+	<div  class="row-fluid">
+		<div id="upload_file" class="span12">
+		<hr>
+		<h2>Upload file</h2>
+				{% if upload_form.errors %}
+					<div class="alert alert-error">
+						<h4>Error!</h4>
+						<p>{{upload_form.errors}}</p>
+					</div>
+				{% endif %}
+				
+				<form method="post" action="{% url 'upload-datasource' %}" enctype="multipart/form-data">
+				{% csrf_token %}
+				<input type="file" name="{{ upload_form.file.name }}" id="id_file" accept=".csv" runat="server" />
+				<input name="path" type="hidden" value="{{ path }}" />
+			    <button id="submit_file" class="btn btn-primary" type="submit" >Upload file</button>
+				</form>
+				
+				</div>
+		
+		</div>
+	</div>
+
+{% endblock %}

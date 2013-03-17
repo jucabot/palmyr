@@ -1,0 +1,7 @@
+{% load url from future %}
+
+<ul class="nav nav-pills">
+  <li {% if tab == 'correlate' %} class="active" {% endif %}><a href="{% url 'correlate-analysis' %}?dpath={{ dpath }}"">Analysis</a></li>
+  <li {% if tab == 'summary' %} class="active" {% endif %}><a href="{% url 'summary-analysis' %}?dpath={{ dpath }}">Features</a></li>
+  <li {% if tab == 'model' %} class="active" {% endif %}><a href="{% url 'model-analysis' %}?dpath={{ dpath }}">Predictions</a></li>
+</ul>

@@ -1,0 +1,19 @@
+
+
+<div id="apply-model-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="ApplyModelModal" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="apply-model-label">Prediction...</h3>
+  </div>
+  <div class="modal-body">
+	<label>File to predict</label>
+	<input id="input-filename" type="text" placeholder="Enter the file path...">
+	<label>Output file path</label>
+	<input id="output-filename" type="text" placeholder="Enter the file path...">
+	
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary" onclick="ftcmd.apply_prediction(current_model_name,$('#input-filename').val(),$('#output-filename').val(), function() {$('#apply-model-modal').modal('hide');});">Predict</button>
+  </div>
+</div>	
