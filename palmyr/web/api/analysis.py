@@ -1,4 +1,25 @@
-from palmyrdb.converter import INT_TYPE, NONE_VALUE
+from palmyrdb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE
+
+
+class FeatureQuery():
+    feature = None
+    
+    def __init__(self,feature):
+        self.feature = feature
+        
+    def get_frequency_distribution(self):
+        df_dict = self.feature.get_frequency_distribution()
+            
+        if self.feature.has_class():
+            df = map(lambda (kv) : [kv[0],kv[1]],df_dict.items())
+        else:
+            
+            df =  {
+                    'categories' : df_dict.keys(),
+                    'series' :  [{ 'name' : self.feature.name, 'data' : df_dict.values() }]
+            }
+        return df
+
 
 class AnalysisQuery():
     fx = None
@@ -39,3 +60,21 @@ class AnalysisQuery():
                             'data' : self.fx.get_correlation_with(self.fy,filter_function=exclude_none_value_function)
                             }]
         return result
+    
+    def correlate(self):
+       
+        if self.fx.has_class() or self.fx.get_type() == TEXT_TYPE:
+            if self.fy.has_class(): #stacked bar
+                return 'stacked-bar',self.query_as_stacked_bar()
+            elif self.fy.get_type() == INT_TYPE or self.fy.get_type() == FLOAT_TYPE: #box plot
+                return 'box-plot',self.query_as_box_plot()
+            elif self.fy.get_type() == TEXT_TYPE :  #stacked bar
+                return 'stacked-bar',self.query_as_stacked_bar()
+            else:
+                return None,None
+        else:
+            if (self.fx.get_type() == INT_TYPE or self.fx.get_type() == FLOAT_TYPE) and (self.fy.get_type() == INT_TYPE or self.fy.get_type() == FLOAT_TYPE):
+                return 'scatter',self.query_as_scatter_plot()
+            
+            else:
+                return None,None

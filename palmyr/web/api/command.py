@@ -6,10 +6,7 @@ import os
 from palmyrdb.converter import TEXT_TYPE, TypeConverter, INT_TYPE, FLOAT_TYPE,\
     NONE_VALUE
 from web.api.nlquery import nlq_parse
-from palmyrdb.core import _freqdist
-from numpy.ma.core import mean
-from numpy.lib.function_base import median, percentile
-from web.api.analysis import AnalysisQuery
+from web.api.analysis import AnalysisQuery, FeatureQuery
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -56,26 +53,12 @@ class FeatureTableCommand():
         else:
             return error('No feature name defined')
         
-        
-    def _get_distribution_function(self,feature):
-        df_dict = feature.freq_dist
-            
-        if feature.has_class():
-            df = map(lambda (kv) : [kv[0],round(kv[1] * self.ftable.get_row_count(),3)],df_dict.items())
-        else:
-            
-            df =  {
-                    'categories' : df_dict.keys(),
-                    'series' :  [{ 'name' : feature.name, 'data' : map(lambda (kv) : round(kv[1] * 100,3),df_dict.items()) }]
-            }
-        return df
-    
     def get_distribution_function(self):
         if 'feature_name' in self.ctx.params:
             fname = self.ctx.params['feature_name']
             feature = self.ftable.get_feature(fname)
-            
-            return success(data=self._get_distribution_function(feature))
+            fq = FeatureQuery(feature)
+            return success(data=fq.get_frequency_distribution())
         else:
             return error('No feature name defined')
 
@@ -254,63 +237,6 @@ class FeatureTableCommand():
         return success(message="Predictions saved to %s" % output_filename)
     
     
-    
-    def _correlate(self,fname_y,fname_x,options):
-        #result = {}
-        
-        fx = self.ftable.get_feature(fname_x)
-        fy = self.ftable.get_feature(fname_y)
-        query = AnalysisQuery(fx,fy)
-        
-        if fx.has_class() or fx.get_type() == TEXT_TYPE:
-            if fy.has_class(): #stacked bar
-                               
-                """
-                series_x = fy.get_distribution_by(fx)
-                    
-                for category in fy.classes:
-                    group_ids = self.ftable.get_row_ids()
-                    group_values = fx.get_values(group_ids)
-                    group_freq = _freqdist(group_values)
-                    if '' in group_freq:
-                        del group_freq['']
-                    
-                    serie = {
-                             'name' : fy.name + "=" + unicode(int(category) if fy.get_type()==INT_TYPE else category),
-                             'data' : map(lambda category : round(group_freq[category],4) if category in group_freq else 0 ,fx.classes)
-                             }
-                    series_y.append(serie)
-                    
-                
-                
-                flat_series = []
-               
-                for i in range(len(series_x)):
-                   
-                    for j in range(len(series_y)):
-                        h =  series_x[i]['data'][j]
-                        w =  series_y[j]['data'][i]
-                       
-                        flat_series.append({'w':w,'h':h})
-                
-                result['series'] = flat_series
-                """
-                
-                return 'stacked-bar',query.query_as_stacked_bar()
-            elif fy.get_type() == INT_TYPE or fy.get_type() == FLOAT_TYPE: #box plot
-                return 'box-plot',query.query_as_box_plot()
-            elif fy.get_type() == TEXT_TYPE :  #stacked bar
-                return 'stacked-bar',query.query_as_stacked_bar()
-            else:
-                return None,None
-    
-        else:
-            if (fx.get_type() == INT_TYPE or fx.get_type() == FLOAT_TYPE) and (fy.get_type() == INT_TYPE or fy.get_type() == FLOAT_TYPE):
-                return 'scatter',query.query_as_scatter_plot()
-            
-            else:
-                return None,None
-    
     def nl_query(self):
         if 'query' not  in self.ctx.params:
             query = ""
@@ -325,7 +251,8 @@ class FeatureTableCommand():
         
         if feature_y is not None and feature_x is None: #single feature analysis
             feature = self.ftable.get_feature(feature_y)
-            data = self._get_distribution_function(feature)
+            fq = FeatureQuery(feature)
+            data = fq.get_frequency_distribution()
             
             if feature.has_class():
                 result_type = 'pie'
@@ -334,9 +261,11 @@ class FeatureTableCommand():
             else:
                 result_type = 'bar'
         elif feature_y is not None and feature_x is not None: #two features analysis
+            fx = self.ftable.get_feature(feature_x)
+            fy = self.ftable.get_feature(feature_y)
+            analysis = AnalysisQuery(fx,fy)
+            result_type,data = analysis.correlate()
             
-            type,data = self._correlate(feature_y,feature_x,options)
-            result_type = type
         else: #show all
             result_type = 'table'
             if 'num_page' in options:
