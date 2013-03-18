@@ -1,15 +1,15 @@
 from django.http import HttpResponse
 import json
-from palmyrweb.views import get_user_root
+from web.views import get_user_root
 from settings import ANALYSIS_ROOT, DATA_ROOT
 import os
 from palmyrdb.converter import TEXT_TYPE, TypeConverter, INT_TYPE, FLOAT_TYPE,\
     NONE_VALUE
-from palmyrweb.api.nlquery import nlq_parse
+from web.api.nlquery import nlq_parse
 from palmyrdb.core import _freqdist
 from numpy.ma.core import mean
 from numpy.lib.function_base import median, percentile
-from palmyrweb.api.analysis import AnalysisQuery
+from web.api.analysis import AnalysisQuery
 
 def success(**kwargs):
     response = { "status":'success'}

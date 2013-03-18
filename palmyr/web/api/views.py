@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from palmyrweb.context import UserContext
+from web.context import UserContext
 from command import FeatureTableCommand,error
 import traceback
 

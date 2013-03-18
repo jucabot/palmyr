@@ -2,14 +2,14 @@
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
-from palmyrweb.forms import UploadFileForm
+from web.forms import UploadFileForm
 from django.template.context import RequestContext
 from settings import DATA_ROOT, ANALYSIS_ROOT
 import os
 from os import listdir
 from os.path import isfile,isdir, join,normpath
 from palmyrdb.core import FeatureTable
-from palmyrweb.context import UserContext
+from web.context import UserContext
 
  
 
