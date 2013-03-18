@@ -19,7 +19,6 @@ def api_analysis(request):
                 return ftcmd.set_target()
             elif cmd == 'reset-target':
                 return ftcmd.reset_target()
-            
             elif cmd == 'save':
                 return ftcmd.save()
             elif cmd == 'set-class':

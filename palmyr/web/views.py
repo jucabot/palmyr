@@ -8,7 +8,7 @@ from settings import DATA_ROOT, ANALYSIS_ROOT
 import os
 from os import listdir
 from os.path import isfile,isdir, join,normpath
-from palmyrdb.core import FeatureTable
+from palmyrdb.featureset import FeatureTable
 from web.context import UserContext
 
  

@@ -74,13 +74,11 @@ class FeatureTableCommand():
     def use_feature(self):
         if 'feature_name' in self.ctx.params:
             if 'use_it' in self.ctx.params:
-        
                 self.ftable.use_feature(self.ctx.params['feature_name'],self.ctx.params['use_it']=='true')
                 self.ctx.set_feature_table(self.ftname, self.ftable)
                 return success()
             else:
                 return error('No use_it param defined')
-    
         else:
             return error('No feature name defined')
     
