@@ -4,12 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
 from web.forms import UploadFileForm
 from django.template.context import RequestContext
-from settings import DATA_ROOT, ANALYSIS_ROOT
+from settings import CONTEXT
 import os
 from os import listdir
 from os.path import isfile,isdir, join,normpath
 from palmyrdb.featureset import FeatureTable
 from web.context import UserContext
+from pickle import load
 
  
 
@@ -27,7 +28,7 @@ def get_user_root(user,root):
     return normpath(user_dir)
 
 def handle_uploaded_file(f,filename,user):
-    user_dir = get_user_root(user,DATA_ROOT)
+    user_dir = get_user_root(user,CONTEXT['data-root'])
     
     path =  user_dir + os.sep +filename
     destination = open(path, 'wb+')
@@ -46,7 +47,7 @@ def upload_file(request):
             #file_instance = FileDataSource(name=name.name,path=path)
             #file_instance.save()
             
-        path, dirs,files = browse(request,DATA_ROOT)
+        path, dirs,files = browse(request,CONTEXT['data-root'])
         
         context = {
             'active_menu' : 'datasource',
@@ -75,7 +76,7 @@ def browse(request, ROOT):
 def browse_datasource(request):
     form = UploadFileForm()
     
-    path, dirs,files = browse(request,DATA_ROOT)
+    path, dirs,files = browse(request,CONTEXT['data-root'])
     
     context = {
         'active_menu' : 'datasource',
@@ -90,7 +91,7 @@ def browse_datasource(request):
 @login_required
 def browse_analysis(request):
     
-    path, dirs,files = browse(request,ANALYSIS_ROOT)
+    path, dirs,files = browse(request,CONTEXT['analysis-root'])
     context = {
         'active_menu' : 'analysis',
         'path': path,
@@ -99,14 +100,18 @@ def browse_analysis(request):
     }
     return render_to_response('analysis/browse.html',context,context_instance=RequestContext(request))
 
+"""
+    Create an analysis from a file
+    (long running)
+"""
 @login_required
 def create_analysis(request):
     
     dpath = request.GET["dpath"]
-    datasource_path = get_user_root(request.user,DATA_ROOT) + dpath
+    datasource_path = get_user_root(request.user,CONTEXT['data-root']) + dpath
     
     #Create feature table from dpath file
-    ftable = FeatureTable()
+    ftable = FeatureTable(context=CONTEXT)
     ftable.load_from_csv(datasource_path)
     ftable.params['datasource-path'] = datasource_path
     name = dpath.split(os.sep)[-1]
@@ -132,11 +137,13 @@ def create_analysis(request):
 def open_analysis(request):
     
     dpath = request.GET["dpath"]
-    analysis_path = get_user_root(request.user,ANALYSIS_ROOT) + dpath
+    analysis_path = get_user_root(request.user,CONTEXT['analysis-root']) + dpath
     
     #Create feature table from dpath file
-    ftable = FeatureTable.open(analysis_path)
-    
+    f = open(analysis_path,'rb')
+    ftable = load(f)
+    f.close()
+
     #save feature table in session as user cache
     request.session['feature_tables:'+dpath] = ftable
     

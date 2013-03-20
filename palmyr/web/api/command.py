@@ -1,12 +1,12 @@
 from django.http import HttpResponse
 import json
 from web.views import get_user_root
-from settings import ANALYSIS_ROOT, DATA_ROOT
+from settings import CONTEXT
 import os
-from palmyrdb.converter import TEXT_TYPE, TypeConverter, INT_TYPE, FLOAT_TYPE,\
-    NONE_VALUE
+from palmyrdb.converter import TEXT_TYPE, TypeConverter
 from web.api.nlquery import nlq_parse
 from web.api.analysis import AnalysisQuery, FeatureQuery
+from pickle import dump
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -62,13 +62,25 @@ class FeatureTableCommand():
         else:
             return error('No feature name defined')
 
+        
     def save(self):
         if 'filename' in self.ctx.params:
             filename = self.ctx.params['filename']
-            self.ftable.save(get_user_root(self.ctx.request.user,ANALYSIS_ROOT)+os.sep +filename)
+            file_path = get_user_root(self.ctx.request.user,CONTEXT['analysis-root'])+os.sep +filename
+            
+            dir_path = file_path.split(os.sep)[:-1]
+            dir_path = os.sep.join(dir_path)
+        
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            
+            f = open(file_path,'wb')
+            dump(self.ftable,f)
+            f.close()
+            
             return success(message="%s stored successfully" % filename) 
         else:
-            self.ftable.save(get_user_root(self.ctx.request.user,ANALYSIS_ROOT)+os.sep + self.ctx.params['dpath'])
+            self.ftable.save(get_user_root(self.ctx.request.user,CONTEXT['analysis-root'])+os.sep + self.ctx.params['dpath'])
             return success(message="%s stored successfully" % self.ctx.params['dpath'])
     
     def use_feature(self):
@@ -230,7 +242,7 @@ class FeatureTableCommand():
         input_filename = self.ctx.params['input']
         output_filename = self.ctx.params['output']
         
-        self.ftable.apply_prediction(model_name,get_user_root(self.ctx.request.user,DATA_ROOT)+os.sep +input_filename,get_user_root(self.ctx.request.user,DATA_ROOT)+os.sep +output_filename)
+        self.ftable.apply_prediction(model_name,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +input_filename,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +output_filename)
         
         return success(message="Predictions saved to %s" % output_filename)
     

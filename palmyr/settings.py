@@ -148,6 +148,11 @@ LOGGING = {
     }
 }
 
-DATA_ROOT = "/home/predictiveds/palmyr-data/data"
-ANALYSIS_ROOT = "/home/predictiveds/palmyr-data/analytics"
-
+#DATA_ROOT = "/home/predictiveds/palmyr-data/data"
+#ANALYSIS_ROOT = "/home/predictiveds/palmyr-data/analytics"
+CONTEXT = {
+            'data-root' : "/home/predictiveds/palmyr-data/data",
+            'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
+            'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
+           
+           }

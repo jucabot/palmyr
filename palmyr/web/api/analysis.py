@@ -51,13 +51,12 @@ class AnalysisQuery():
     
     def query_as_scatter_plot(self):
         result = {}
-        exclude_none_value_function = lambda table,i : table.get_value(self.fx.name,i) != NONE_VALUE and table.get_value(self.fy.name,i) != NONE_VALUE
-                
+        
         result['label_x'] = self.fx.name
         result['label_y'] = self.fy.name
         result['series'] = [{
                             'name' : self.fx.name + '^' + self.fy.name,
-                            'data' : self.fx.get_correlation_with(self.fy,filter_function=exclude_none_value_function)
+                            'data' : self.fx.get_correlation_with(self.fy)
                             }]
         return result
     
