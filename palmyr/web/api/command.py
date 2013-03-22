@@ -104,11 +104,6 @@ class FeatureTableCommand():
         else:
             return error('No feature name defined')
     
-    def build_model(self):
-        model,model_info = self.ftable.build_model()
-        self.ftable.current_model = (model,model_info)
-        self.ctx.set_feature_table(self.ftname, self.ftable)
-        return success(model_info=model_info.get_properties())
         
     def save_model(self):
         if self.ftable.current_model is None:
@@ -199,9 +194,25 @@ class FeatureTableCommand():
         
         return success(message="Feature %s successfully removed" % name)
     
-    def select_best_features(self):
+    def build_model(self):
+        if 'filter' in self.ctx.params:
+            filter_code = self.ctx.params['filter']
+        else:
+            filter_code = None
         
-        kbest = self.ftable.select_best_features()
+        model,model_info = self.ftable.build_model(filter_code=filter_code)
+        self.ftable.current_model = (model,model_info)
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+        return success(model_info=model_info.get_properties())
+    
+    
+    def select_best_features(self):
+        if 'filter' in self.ctx.params:
+            filter_code = self.ctx.params['filter']
+        else:
+            filter_code = None
+        
+        kbest = self.ftable.select_best_features(filter_code=filter_code)
         
         return success(kbest=kbest)
     
