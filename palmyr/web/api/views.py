@@ -51,7 +51,12 @@ def api_analysis(request):
                 return ftcmd.apply_prediction()
             elif cmd == 'nl-query':
                 return ftcmd.nl_query()
-            
+            elif cmd == 'add-filter':
+                return ftcmd.add_filter()
+            elif cmd == 'select-filter':
+                return ftcmd.select_filter()
+            elif cmd == 'clear-filter':
+                return ftcmd.clear_filter()
             else:
                 return error('Undefined api command %s' % cmd)
         else:

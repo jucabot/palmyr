@@ -7,6 +7,7 @@ from palmyrdb.converter import TEXT_TYPE, TypeConverter
 from web.api.nlquery import nlq_parse
 from web.api.analysis import AnalysisQuery, FeatureQuery
 from pickle import dump
+from palmyrdb.script import compile_func_code
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -257,11 +258,15 @@ class FeatureTableCommand():
         
         result_type = None
         data = None
-        
+        filter_function = None
+        if 'filter'  in self.ctx.params:
+            filter_code = self.ctx.params['filter']
+            filter_function = compile_func_code(filter_code)
         
         if feature_y is not None and feature_x is None: #single feature analysis
             feature = self.ftable.get_feature(feature_y)
             fq = FeatureQuery(feature)
+            fq.filter_function = filter_function
             data = fq.get_frequency_distribution()
             
             if feature.has_class():
@@ -274,6 +279,7 @@ class FeatureTableCommand():
             fx = self.ftable.get_feature(feature_x)
             fy = self.ftable.get_feature(feature_y)
             analysis = AnalysisQuery(fx,fy)
+            analysis.filter_function = filter_function
             result_type,data = analysis.correlate()
             
         else: #show all
@@ -282,7 +288,45 @@ class FeatureTableCommand():
                 num_page = int(options['num_page'])
             else:
                 num_page = 0
-            data = self.ftable.get_datatable(from_page=num_page)
+            data = self.ftable.get_datatable(from_page=num_page,filter_function=filter_function)
         return success(type=result_type,data=data,query=query)
+    
+    def add_filter(self):
+        if 'name' not  in self.ctx.params:
+            return error('No name defined')
+        if 'code' not  in self.ctx.params:
+            return error('No filter code defined')
+
+        name = self.ctx.params['name']
+        code = self.ctx.params['code']
         
+        self.ftable.add_filter(name,code)
+        
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+
+        return success(message="Filter %s added successfully" % name )
+    def select_filter(self):
+        if 'name' not  in self.ctx.params:
+            return error('No name defined')
+        
+        name = self.ctx.params['name']
+        
+        if name not  in self.ftable.filters:
+            return error('Filter %s doesn\'t exist' % name)
+
+        filter = self.ftable.filters[name]
+        
+        self.ftable.current_filter = filter
+        
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+
+        return success(data=filter )
+    def clear_filter(self):
+        
+        self.ftable.current_filter = None
+        
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+
+        return success()
+    
     

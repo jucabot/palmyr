@@ -3,12 +3,14 @@ from palmyrdb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE
 
 class FeatureQuery():
     feature = None
+    filter_function = None
     
-    def __init__(self,feature):
+    def __init__(self,feature,filter_function=None):
         self.feature = feature
+        self.filter_function = filter_function
         
     def get_frequency_distribution(self):
-        df_dict = self.feature.get_frequency_distribution()
+        df_dict = self.feature.get_frequency_distribution(filter_function=self.filter_function)
             
         if self.feature.has_class():
             df = map(lambda (kv) : [kv[0],kv[1]],df_dict.items())
@@ -24,10 +26,12 @@ class FeatureQuery():
 class AnalysisQuery():
     fx = None
     fy = None
+    filter_function=None
     
-    def __init__(self,fx,fy):
+    def __init__(self,fx,fy,filter_function=None):
         self.fx = fx
         self.fy = fy
+        self.filter_function = filter_function
     
     def query_as_stacked_bar(self):
         result = {}
@@ -35,7 +39,7 @@ class AnalysisQuery():
         result['label_x'] = self.fx.name
         result['label_y'] = self.fy.name
         result['categories'] = map(lambda category : self.fx.name + "=" + unicode(int(category) if self.fx.get_type()==INT_TYPE else category),self.fx.classes)      
-        result['series'] = self.fx.get_distribution_by(self.fy,centile=True)
+        result['series'] = self.fx.get_distribution_by(self.fy,centile=True,filter_function=self.filter_function)
         
         return result
     
@@ -45,7 +49,7 @@ class AnalysisQuery():
         result['label_x'] =  self.fx.name
         result['label_y'] =  self.fy.name
         result['categories'] =  self.fx.classes
-        result['series'] = self.fy.get_distribution_stats_by( self.fx,centile=True)
+        result['series'] = self.fy.get_distribution_stats_by( self.fx,centile=True,filter_function=self.filter_function)
         
         return result
     
@@ -56,7 +60,7 @@ class AnalysisQuery():
         result['label_y'] = self.fy.name
         result['series'] = [{
                             'name' : self.fx.name + '^' + self.fy.name,
-                            'data' : self.fx.get_correlation_with(self.fy)
+                            'data' : self.fx.get_correlation_with(self.fy,filter_function=self.filter_function)
                             }]
         return result
     
