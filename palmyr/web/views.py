@@ -14,7 +14,6 @@ from pickle import load
 
  
 
-@login_required
 def home(request):
     context = {'active_menu' : 'home' }
     return render_to_response('home.html',context)
@@ -59,13 +58,17 @@ def upload_file(request):
         return render_to_response('datasource/browse.html',context,context_instance=RequestContext(request))
 
 
-def browse(request, ROOT):
+def get_path(request):
     path = "/"
     if 'path' in request.GET:
         path = request.GET['path'].replace('.','/')
     if path == '':
         path = "/"
+    return path
+
+def browse(request, ROOT):
     
+    path = get_path(request)
     user_dir = get_user_root(request.user, ROOT) + path
     files = [ f for f in listdir(user_dir) if isfile(join(user_dir,f)) ]
     dirs = [ f for f in listdir(user_dir) if isdir(join(user_dir,f)) ]
@@ -233,9 +236,27 @@ def correlate_analysis(request):
     else:
         return redirect('browse-analysis')
             
+def browse_datahub(request):
     
+    path =  get_path(request)
+    absolute_path = CONTEXT['datahub-root'] + path
+    files = [ f for f in listdir(absolute_path) if isfile(join(absolute_path,f)) ]
+    dirs = [ f for f in listdir(absolute_path) if isdir(join(absolute_path,f)) ]
 
-    
+    context = {
+        'active_menu' : 'datahub',
+        'path': path,
+        'files' : files,
+        'directories' : dirs,
+    }
+    return render_to_response('datahub/browse.html',context,context_instance=RequestContext(request))
+
+def show_data(request):
+    context = {
+        'active_menu' : 'datahub',
+     
+    }
+    return render_to_response('datahub/show.html',context,context_instance=RequestContext(request))
  
     
     

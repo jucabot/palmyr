@@ -99,6 +99,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+   
 )
 
 ROOT_URLCONF = 'palmyr.urls'
@@ -148,9 +149,8 @@ LOGGING = {
     }
 }
 
-#DATA_ROOT = "/home/predictiveds/palmyr-data/data"
-#ANALYSIS_ROOT = "/home/predictiveds/palmyr-data/analytics"
 CONTEXT = {
+            'datahub-root' : "/home/predictiveds/palmyr-data/datahub",
             'data-root' : "/home/predictiveds/palmyr-data/data",
             'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",

@@ -199,8 +199,14 @@ class FeatureTableCommand():
             filter_code = self.ctx.params['filter']
         else:
             filter_code = None
+            
+        if 'filter_name' in self.ctx.params:
+            filter_name = self.ctx.params['filter_name']
+        else:
+            filter_name = None
+            
         
-        model,model_info = self.ftable.build_model(filter_code=filter_code)
+        model,model_info = self.ftable.build_model(filter_name=filter_name,filter_code=filter_code)
         self.ftable.current_model = (model,model_info)
         self.ctx.set_feature_table(self.ftname, self.ftable)
         return success(model_info=model_info.get_properties())
