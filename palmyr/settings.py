@@ -152,6 +152,7 @@ LOGGING = {
 CONTEXT = {
             'datahub-root' : "/home/predictiveds/palmyr-data/datahub",
             'data-root' : "/home/predictiveds/palmyr-data/data",
+            'marketplace-data-root' : "/home/predictiveds/palmyr-data/marketplace_data",
             'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
            

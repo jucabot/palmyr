@@ -8,6 +8,7 @@ from web.api.nlquery import nlq_parse
 from web.api.analysis import AnalysisQuery, FeatureQuery
 from pickle import dump
 from palmyrdb.script import compile_func_code
+from palmyrdb.featureset import FeatureTable
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -15,8 +16,57 @@ def success(**kwargs):
     return HttpResponse(json.dumps(response))
 
 def error(message):
-    
     return HttpResponse(json.dumps({ "status":"error" , "message":"%s" % str(message)}))
+
+
+
+class GeneralCommand():
+    ctx = None
+    def __init__(self,context):
+        self.ctx = context
+    
+    def get_content(self):
+        if 'base' in self.ctx.params:
+            if 'key' in self.ctx.params:
+                abs_path = CONTEXT[self.ctx.params['base']] + self.ctx.params['key']
+                f = open (abs_path,mode='r')
+                content = json.load(f)
+                f.close()
+                return success(data=content)
+            else:
+                return error('No key defined')
+        else:
+            return error('No base directory defined')
+    
+    def create_analysis(self):
+        if 'data_id' in self.ctx.params:
+            if 'base' in self.ctx.params:
+                base = CONTEXT[self.ctx.params['base']]
+            else:
+                self.ctx.get_user_root()
+                
+            
+            dpath = self.ctx.params["data_id"]
+            datasource_path = base + dpath
+            
+            #Create feature table from dpath file
+            ftable = FeatureTable(context=CONTEXT)
+            ftable.load_from_csv(datasource_path)
+            ftable.params['datasource-path'] = datasource_path
+            name = dpath.split(os.sep)[-1]
+            first_feature = ftable.get_features()[0][1]
+            if first_feature.target_allowed():
+                ftable.set_target(first_feature.name) # define first feature as target
+            
+            #save feature table in session as user cache
+            self.ctx.set_feature_table(dpath,ftable)
+            ftable.params['name'] = name #dpath name is default name        
+                        
+            return success(name=dpath)
+            
+        else:
+            return error('No data_id directory defined')
+    
 
 
 class FeatureTableCommand():

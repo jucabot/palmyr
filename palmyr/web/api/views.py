@@ -2,7 +2,28 @@ from django.contrib.auth.decorators import login_required
 from web.context import UserContext
 from command import FeatureTableCommand,error
 import traceback
+from web.api.command import GeneralCommand
 
+def api_general(request):
+    
+    cmd = request.GET['cmd']
+    ctx = UserContext(request)
+    gcmd = GeneralCommand(ctx)
+    try:
+        if cmd == 'get-content':
+            return gcmd.get_content()
+        elif cmd == 'create-analysis':
+            if not request.user.is_authenticated():
+                return login_required()
+            else:
+                return gcmd.create_analysis()
+        else:
+                return error('Undefined api command %s' % cmd)
+
+    except Exception, e:
+        print traceback.format_exc()
+        return error(str(e))
+    
 @login_required
 def api_analysis(request):
     

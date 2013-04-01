@@ -252,8 +252,13 @@ def browse_datahub(request):
     return render_to_response('datahub/browse.html',context,context_instance=RequestContext(request))
 
 def show_data(request):
+    
+    path =  request.GET['dpath']
+    absolute_path = CONTEXT['datahub-root'] + path
     context = {
         'active_menu' : 'datahub',
+        'path': path,
+        'base' : 'datahub-root',
      
     }
     return render_to_response('datahub/show.html',context,context_instance=RequestContext(request))

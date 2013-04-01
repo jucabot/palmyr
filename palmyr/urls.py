@@ -29,4 +29,5 @@ urlpatterns = patterns('',
     url(r'^analysis/api$', 'web.api.views.api_analysis', name='api-analysis'),
     url(r'^datahub/browse$', 'web.views.browse_datahub', name='browse-datahub'),
     url(r'^datahub/show$', 'web.views.show_data', name='show-data'),
+    url(r'^api$', 'web.api.views.api_general', name='api-general'),
 )
