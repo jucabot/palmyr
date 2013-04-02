@@ -104,7 +104,7 @@ def browse_analysis(request):
     return render_to_response('analysis/browse.html',context,context_instance=RequestContext(request))
 
 """
-    Create an analysis from a file
+    Create an analysis from a file - to decommission to api/create_analysis command
     (long running)
 """
 @login_required
@@ -114,7 +114,7 @@ def create_analysis(request):
     datasource_path = get_user_root(request.user,CONTEXT['data-root']) + dpath
     
     #Create feature table from dpath file
-    ftable = FeatureTable(context=CONTEXT)
+    ftable = FeatureTable.create(context=CONTEXT)
     ftable.load_from_csv(datasource_path)
     ftable.params['datasource-path'] = datasource_path
     name = dpath.split(os.sep)[-1]
@@ -263,7 +263,7 @@ def show_data(request):
     }
     return render_to_response('datahub/show.html',context,context_instance=RequestContext(request))
  
-    
+
     
     
     

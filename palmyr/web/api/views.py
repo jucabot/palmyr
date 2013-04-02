@@ -78,6 +78,10 @@ def api_analysis(request):
                 return ftcmd.select_filter()
             elif cmd == 'clear-filter':
                 return ftcmd.clear_filter()
+            elif cmd == 'get-featureset':
+                return ftcmd.get_featureset()
+            elif cmd == 'remove-model':
+                return ftcmd.remove_model()
             else:
                 return error('Undefined api command %s' % cmd)
         else:

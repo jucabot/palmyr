@@ -50,7 +50,7 @@ class GeneralCommand():
             datasource_path = base + dpath
             
             #Create feature table from dpath file
-            ftable = FeatureTable(context=CONTEXT)
+            ftable = FeatureTable.create(context=CONTEXT)
             ftable.load_from_csv(datasource_path)
             ftable.params['datasource-path'] = datasource_path
             name = dpath.split(os.sep)[-1]
@@ -396,4 +396,17 @@ class FeatureTableCommand():
 
         return success()
     
+    def get_featureset(self):
+        return success(data=self.ftable.get_properties())
+    
+    def remove_model(self):
+        
+        if 'model' not  in self.ctx.params:
+            return error('No model name defined')
+        model_name = self.ctx.params['model']
+        del self.ftable.models[model_name]
+        
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+
+        return success()
     
