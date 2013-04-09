@@ -1,4 +1,5 @@
 # Django settings for palmyr project.
+from multiprocessing import cpu_count
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -154,6 +155,8 @@ CONTEXT = {
             'data-root' : "/home/predictiveds/palmyr-data/data",
             'marketplace-data-root' : "/home/predictiveds/palmyr-data/marketplace_data",
             'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
+            'spark-cluster' : "local[%d]" % cpu_count(),
+            'correlation-index-path' : "/home/predictiveds/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
            
            }
