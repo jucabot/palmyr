@@ -152,11 +152,14 @@ LOGGING = {
 
 CONTEXT = {
             'datahub-root' : "/home/predictiveds/palmyr-data/datahub",
+            'datahub-store' : 'http://localhost:9200/',
+            'datahub-index' : "datahub",
             'data-root' : "/home/predictiveds/palmyr-data/data",
             'marketplace-data-root' : "/home/predictiveds/palmyr-data/marketplace_data",
             'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
             'spark-cluster' : "local[%d]" % cpu_count(),
             'correlation-index-path' : "/home/predictiveds/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
+            
            
            }
