@@ -30,4 +30,6 @@ urlpatterns = patterns('',
     url(r'^datahub/browse$', 'web.views.browse_datahub', name='browse-datahub'),
     url(r'^datahub/show$', 'web.views.show_data', name='show-data'),
     url(r'^api$', 'web.api.views.api_general', name='api-general'),
+    url(r'^search$', 'search.views.search', name='search'),
+    url(r'^api/search$', 'search.views.api', name='search-api'),
 )

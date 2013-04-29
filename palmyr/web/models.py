@@ -1,8 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User
 from settings import MEDIA_ROOT
 
 # Create your models here.
 
 class FileDataSource(models.Model):
     name = models.CharField(max_length=100)
-    path = models.CharField(max_length=500)
+    path = models.FileField(upload_to='user_data')
+    user = models.ForeignKey(User)
+    
+    

@@ -266,4 +266,3 @@ def show_data(request):
 
     
     
-    
