@@ -13,7 +13,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/predictiveds/palmyr-data/sqlite.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/home/predictiveds/Dropbox/palmyr-data/sqlite.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -152,14 +152,14 @@ LOGGING = {
 }
 
 CONTEXT = {
-            'datahub-root' : "/home/predictiveds/palmyr-data/datahub",
+            'datahub-root' : "/home/predictiveds/Dropbox/palmyr-data/datahub",
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
-            'data-root' : "/home/predictiveds/palmyr-data/data",
-            'marketplace-data-root' : "/home/predictiveds/palmyr-data/marketplace_data",
-            'analysis-root' : "/home/predictiveds/palmyr-data/analytics",
+            'data-root' : "/home/predictiveds/Dropbox/palmyr-data/data",
+            'marketplace-data-root' : "/home/predictiveds/Dropbox/palmyr-data/marketplace_data",
+            'analysis-root' : "/home/predictiveds/Dropbox/palmyr-data/analytics",
             'spark-cluster' : "local[%d]" % cpu_count(),
-            'correlation-index-path' : "/home/predictiveds/palmyr-data/correlation-search/index.txt",
+            'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
             
            
