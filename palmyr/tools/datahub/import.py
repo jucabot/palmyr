@@ -10,7 +10,7 @@ def delete_all():
     es.delete_index("datahub")
 
 
-def load(filename,index_name,type_name,category,zone="France",sep=";",display="timeline"):
+def load(filename,index_name,type_name,category,zone="France",sep=";",display="timeline", source='',description=''):
     
     f = open(filename,mode='r')
     es = ElasticSearch(CONTEXT['datahub-store'])
@@ -31,6 +31,8 @@ def load(filename,index_name,type_name,category,zone="France",sep=";",display="t
          "display": display,
          "zone": zone,
          "category" : category,
+         "source" : source,
+         'description' : description % (key),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
         es.index(index_name, type_name, serie,id=key)
@@ -39,7 +41,7 @@ def load(filename,index_name,type_name,category,zone="France",sep=";",display="t
     es.refresh(index_name)
     f.close()
 
-def load2(filename,index_name,type_name,category,zone="France",sep=";",display="timeline"):
+def load2(filename,index_name,type_name,category,zone="France",sep=";",display="timeline",source='',description=''):
     
     f = open(filename,mode='r')
     es = ElasticSearch(CONTEXT['datahub-store'])
@@ -51,13 +53,16 @@ def load2(filename,index_name,type_name,category,zone="France",sep=";",display="
         if sum(value.values()) == 0: #remove emptie serie
             continue
         
+        key = value['label']
         serie = {
-         "name" : value['label'],
+         "name" : key,
          "owner" : "public",
          "display": display,
          "zone": zone,
          "category" : category,
-         "data" : {'series':[{'name': value['label'], 'data':map(lambda (k,v) : [k,v],value.items())}]}
+         "source" : source,
+         'description' : description % (key),
+         "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
         es.index(index_name, type_name, serie,id=value['label'])
 
@@ -65,7 +70,7 @@ def load2(filename,index_name,type_name,category,zone="France",sep=";",display="
     es.refresh(index_name)
     f.close()
 
-def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep=";",display="wordcloud"):
+def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep=";",display="wordcloud",source='',description=''):
     
     f = open(filename,mode='r')
     es = ElasticSearch(CONTEXT['datahub-store'])
@@ -83,6 +88,8 @@ def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep
      "display": display,
      "zone": zone,
      "category" : category,
+     "source" : source,
+     'description' : description % (name),
      "data" : { 'categories': map(lambda item : item[0],categories), 'series': [{'data': map(lambda item : item[1],categories)}]  }
      }
     es.index(index_name, type_name, serie,id=name)
@@ -91,7 +98,7 @@ def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep
     es.refresh(index_name)
     f.close()
 
-def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",display="pie"):
+def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",display="pie",source='',description=''):
     
     f = open(filename,mode='r')
     es = ElasticSearch(CONTEXT['datahub-store'])
@@ -109,6 +116,8 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
      "display": display,
      "zone": zone,
      "category" : category,
+     "source" : source,
+     'description' : description % (key),
      "data" : { 'categories' : categories.keys(), 'series' : [{'data' :  categories.values()}] }
      }
     es.index(index_name, type_name, serie,id=name)
@@ -117,10 +126,9 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
     es.refresh(index_name)
     f.close()
 
-
-delete_all()
-load("/home/predictiveds/palmyr-data/import datahub/all_socio_economic.txt","datahub","serie","Economie")
-load("/home/predictiveds/palmyr-data/import datahub/gtrends.txt","datahub","serie","Recherche Google")
-load_wordcloud("/home/predictiveds/palmyr-data/import datahub/word_count_full.txt.top200","datahub","serie","Doctissimo","mots clefs doctissimo")
-load_pie("/home/predictiveds/palmyr-data/import datahub/forum_count_full.csv","datahub","serie","Doctissimo",u"Répartition des messages doctissimo par forums")
-load("/home/predictiveds/palmyr-data/import datahub/word_series_full.top200.txt","datahub","serie","Doctissimo")
+delete_all() 
+load("/home/predictiveds/palmyr-data/import datahub/all_socio_economic.txt","datahub","serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
+load("/home/predictiveds/palmyr-data/import datahub/gtrends.txt","datahub","serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
+load_wordcloud("/home/predictiveds/palmyr-data/import datahub/word_count_full.txt.top200","datahub","serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
+load_pie("/home/predictiveds/palmyr-data/import datahub/forum_count_full.csv","datahub","serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
+load("/home/predictiveds/palmyr-data/import datahub/word_series_full.top200.txt","datahub","serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")

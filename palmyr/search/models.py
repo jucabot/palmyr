@@ -19,7 +19,7 @@ class Workspace(models.Model):
     name = models.CharField(max_length=500)
     value = models.TextField()
     user = models.ForeignKey(User)
-    icon_path = models.CharField(max_length=200)
+    icon_path = models.CharField(max_length=200,default="default.png")
     
     def __unicode__(self):
         return self.name

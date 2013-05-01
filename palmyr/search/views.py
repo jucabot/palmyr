@@ -20,7 +20,8 @@ def api(request):
         
         if cmd_op == 'search':
             return cmd.search()
-
+        elif cmd_op == 'open-workspace':
+            return cmd.open_workspace()
         else:
             return cmd.error('Undefined api command %s' % cmd_op)
 
