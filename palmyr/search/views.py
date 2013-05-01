@@ -20,8 +20,12 @@ def api(request):
         
         if cmd_op == 'search':
             return cmd.search()
+        elif cmd_op == 'get-workspaces':
+            return cmd.get_workspaces()
         elif cmd_op == 'open-workspace':
             return cmd.open_workspace()
+        elif cmd_op == 'remove-workspace':
+            return cmd.remove_workspace()
         else:
             return cmd.error('Undefined api command %s' % cmd_op)
 

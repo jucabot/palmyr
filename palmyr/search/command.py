@@ -54,6 +54,14 @@ class SearchCommand(Command):
                 result_type = 'serie-list'
         return self.success(type=result_type,data=data,query=query)
     
+    def get_workspaces(self):
+        workspaces = []
+        if self.ctx.request.user.is_authenticated():
+            workspace_set = self.ctx.request.user.workspace_set.all()
+            for workspace in workspace_set:
+                workspaces.append({'id':workspace.id,'name':workspace.name, 'icon_path':workspace.icon_path })
+        return self.success(workspaces=workspaces)
+    
     def open_workspace(self):
         
         serie_id = self.ctx.params['serie_id']
@@ -65,4 +73,15 @@ class SearchCommand(Command):
             workspace.save()
         
         return self.success(name=serie_id)
+    
+    def remove_workspace(self):
+        
+        id_workspace = self.ctx.params['id']
+        
+        try:
+            workspace = Workspace.objects.get(id=id_workspace,user=self.ctx.request.user)
+            workspace.delete()
+        except Workspace.DoesNotExist:
+            pass
+        return self.success()
         
