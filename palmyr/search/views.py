@@ -20,6 +20,8 @@ def api(request):
         
         if cmd_op == 'search':
             return cmd.search()
+        elif cmd_op == 'correlate':
+            return cmd.correlate()
         elif cmd_op == 'get-workspaces':
             return cmd.get_workspaces()
         elif cmd_op == 'open-workspace':
