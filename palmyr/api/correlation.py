@@ -10,8 +10,6 @@ import datetime
 import numpy as np
 from sklearn.svm import SVR
 from sklearn.preprocessing import scale
-from multiprocessing import cpu_count
-from operator import add
 
 
 def get_date(date_str, date_format="%Y-%m-%d %H:%M:%S"):
@@ -78,7 +76,7 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
     predictor_key = predictor_data[0]
     
     predictor = cjson.decode(predictor_data[1])
-    #predictor = transform_serie(predictor)
+    predictor = transform_serie(predictor)
     
         
     key = str(predictor_key)
@@ -95,9 +93,9 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         (list_key,list_variable, list_predictor) = serie_join(variable.value, lagged_predictor)
         
-        if len(list_predictor) == 0:
-            print "no match"
-            results[i] = None
+        if len(list_predictor) < 10:
+            
+            results[str(i)] = {'r2' : 0}
             continue
         
         y = np.array(list_variable,ndmin=1)
@@ -109,18 +107,23 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         X = scale(X)
         
-        svr_rbf = SVR(kernel=kernel_variable.value)
-
-        svr_rbf.fit(X, y)
+        clf = SVR(kernel=kernel_variable.value)
+        clf.fit(X, y)
         
-        r_squared = svr_rbf.score(X, y)
+        r_squared = clf.score(X, y)
         
         #predicted_y = list(svr_rbf.predict(original_X))
+        
+        if r_squared < 0.5:
+            results[str(i)] = {'r2' : 0}
+            continue
         
         
         result = {}
         
         result["r2"] = r_squared
+        
+        
         #result["y"] = list_variable
         #result["x"] = list_predictor
         #result["predicted_y"] = predicted_y
@@ -129,9 +132,18 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
 
     return { 'id':key, 'results': results}
 
+
+def filter_correlation_results (serie): 
+    for item in serie['results'].values():
+        if item['r2'] != 0:
+            return True
+    
+    return False
+
 class CorrelationSearch():
     
     context = None
+    _debug = False
     _sc = None
     _index_rdd = None
     search_timeserie_data = None
@@ -139,32 +151,44 @@ class CorrelationSearch():
     
     def __init__(self,context):
         self.context = context
-        self._sc = SparkContext(self.context["spark-cluster"], "Inlight/data Correlation search")
+        
         self.index_file_name = self.context["correlation-index-path"]
-        self._index_rdd = self._sc.textFile(self.index_file_name).cache()
+        
+        self._debug = self.context["spark-cluster"] == 'debug'
+        
+        if self._debug:
+            self._debug = True
+            print "Spark in debug mode (as single threaded map)"
+        else:
+            self._debug = False
+            self._sc = SparkContext(self.context["spark-cluster"], "Inlight/data Correlation search")
+            self._index_rdd = self._sc.textFile(self.index_file_name)
 
         
     def search(self, search_timeserie,lag=12,kernel='linear'):
     
-        lag_variable = self._sc.broadcast(lag)
-        kernel_variable = self._sc.broadcast(kernel)
-        search_timeserie_data = self._sc.broadcast(transform_serie(search_timeserie))
-        
-        search_result_rdd = self._index_rdd.map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable))
-        search_result =  search_result_rdd.collect()
-        return search_result
+        if self._debug:
+            lag_variable = broadcast(lag)
+            kernel_variable = broadcast(kernel)
+            search_timeserie_data = broadcast(transform_serie(search_timeserie))
+            
+            result = filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),open(self.index_file_name,mode='r')))
+            
+            return result
+            
+        else:
+            lag_variable = self._sc.broadcast(lag)
+            kernel_variable = self._sc.broadcast(kernel)
+            search_timeserie_data = self._sc.broadcast(transform_serie(search_timeserie))
+            
+            search_result_rdd = self._index_rdd.map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable))
+            search_result =  search_result_rdd.filter(filter_correlation_results).collect()
+            return search_result
 
-    def debug(self, search_timeserie,lag=12,kernel='linear'):
-        lag_variable = broadcast(lag)
-        kernel_variable = broadcast(kernel)
-        search_timeserie_data = broadcast(transform_serie(search_timeserie))
-        
-        result = map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),open(self.index_file_name,mode='r'))
-        
-        return result
         
     def close(self):
-        self._sc.stop()
+        if not self._debug:
+            self._sc.stop()
 
 class BroadcastVariable():
     value = None

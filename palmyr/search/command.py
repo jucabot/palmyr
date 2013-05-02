@@ -4,6 +4,7 @@ from api.datahub import Datahub
 from string import lower
 from search.models import Workspace
 from api.correlation import CorrelationSearch
+import datetime
 
 class SearchCommand(Command):
     
@@ -66,12 +67,12 @@ class SearchCommand(Command):
         query = self.ctx.params['query']
         (result_type, search_timeserie) = self._query(query, self.ctx.request.user.id)
         
+        start = datetime.datetime.now()
         cs = CorrelationSearch(CONTEXT)
         result = cs.search(search_timeserie['series'][0]['data'])
-        #result = cs.debug(search_timeserie['series'][0]['data'])
         cs.close()
         
-        return self.success(data=result)
+        return self.success(data=result,took=str(datetime.datetime.now()-start))
     
     
     def get_workspaces(self):
