@@ -10,7 +10,7 @@ from web.context import UserContext
 from search.command import SearchCommand
 import traceback
 
-
+@login_required
 def api(request):
     
     cmd_op = request.GET['cmd']
@@ -36,20 +36,20 @@ def api(request):
         return cmd.error(str(e))
 
  
- 
+@login_required 
 def search(request):
     
     domains = Domain.objects.all()
-    if request.user.is_authenticated():
-        workspaces = request.user.workspace_set.all()
-    else:
-        workspaces = [] 
+    
     
     context = {
     'active_menu' : 'search',
     'domains' : domains,
-    'workspaces' : workspaces,
     }
+    
+    if 'tab' in request.GET:
+        context['tab'] = request.GET['tab'] 
+    
     return render_to_response('search/search.html',context,context_instance=RequestContext(request))
 
     

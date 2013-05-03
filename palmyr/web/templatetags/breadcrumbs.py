@@ -35,41 +35,12 @@ def render(parts):
         
     html = "<ul class=\"breadcrumb\">"
     for name,path in parts[:-1]:
-        name = name if name != '' else "My folder"
+        name = name if name != '' else "Mes donn&eacute;es"
         html += "<li><a href=\"?path=" + path + "\">" + name + "</a> <span class=\"divider\">/</span></li>"
     name,path = parts[-1]
-    name = name if name != '' else "My folder"
+    name = name if name != '' else "Mes donn&eacute;es"
     html += "<li class=\"active\">" + name  + "</li>"
     html += "</ul>"
     
     return html
 
-@register.filter
-def datahubbreadcrumb(value,arg="/"):
-    i=0
-    parts = []
-    
-    value = value.replace('//','/')
-    
-    if value[-1] == "/":
-        value = value[:-1] 
-    
-    paths = value.split(arg)
-    
-    for i in range(len(paths)):
-        parts.append((paths[i],build_part(i,paths,arg)))
-    
-    return mark_safe(render_datahub(parts))
-def render_datahub(parts):
-        
-    html = "<ul class=\"breadcrumb\">"
-    for name,path in parts[:-1]:
-        name = name if name != '' else "Data hub"
-        html += "<li><a href=\"?path=" + path + "\">" + name + "</a> <span class=\"divider\">/</span></li>"
-    name,path = parts[-1]
-    name = name if name != '' else "Data hub"
-    html += "<li class=\"active\">" + name  + "</li>"
-    html += "</ul>"
-    
-    return html
-    

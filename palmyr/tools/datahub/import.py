@@ -35,7 +35,7 @@ def load(filename,index_name,type_name,category,zone="France",sep=";",display="t
          'description' : description % (key),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
-        es.index(index_name, type_name, serie,id=key)
+        es.index(index_name, type_name, serie)
 
     
     es.refresh(index_name)
@@ -64,7 +64,7 @@ def load2(filename,index_name,type_name,category,zone="France",sep=";",display="
          'description' : description % (key),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
-        es.index(index_name, type_name, serie,id=value['label'])
+        es.index(index_name, type_name, serie)
 
     
     es.refresh(index_name)
@@ -92,7 +92,7 @@ def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep
      'description' : description % (name),
      "data" : { 'categories': map(lambda item : item[0],categories), 'series': [{'data': map(lambda item : item[1],categories)}]  }
      }
-    es.index(index_name, type_name, serie,id=name)
+    es.index(index_name, type_name, serie)
 
     
     es.refresh(index_name)
@@ -120,15 +120,15 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
      'description' : description % (key),
      "data" : { 'categories' : categories.keys(), 'series' : [{'data' :  categories.values()}] }
      }
-    es.index(index_name, type_name, serie,id=name)
+    es.index(index_name, type_name, serie)
 
     
     es.refresh(index_name)
     f.close()
 
-delete_all() 
-load("/home/predictiveds/palmyr-data/import datahub/all_socio_economic.txt","datahub","serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
-load("/home/predictiveds/palmyr-data/import datahub/gtrends.txt","datahub","serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
-load_wordcloud("/home/predictiveds/palmyr-data/import datahub/word_count_full.txt.top200","datahub","serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
-load_pie("/home/predictiveds/palmyr-data/import datahub/forum_count_full.csv","datahub","serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
-load("/home/predictiveds/palmyr-data/import datahub/word_series_full.top200.txt","datahub","serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
+#delete_all() 
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/all_socio_economic.txt","datahub","serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/gtrends.txt","datahub","serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
+load_wordcloud("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_count_full.txt.top200","datahub","serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
+load_pie("/home/predictiveds/Dropbox/palmyr-data/import datahub/forum_count_full.csv","datahub","serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_series_full.top200.txt","datahub","serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")

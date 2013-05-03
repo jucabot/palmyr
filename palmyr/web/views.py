@@ -15,8 +15,7 @@ from pickle import load
  
 
 def home(request):
-    context = {'active_menu' : 'home' }
-    return render_to_response('home.html',context)
+    return redirect('search')
 
 #Data source
 
@@ -236,33 +235,6 @@ def correlate_analysis(request):
     else:
         return redirect('browse-analysis')
             
-def browse_datahub(request):
-    
-    path =  get_path(request)
-    absolute_path = CONTEXT['datahub-root'] + path
-    files = [ f for f in listdir(absolute_path) if isfile(join(absolute_path,f)) ]
-    dirs = [ f for f in listdir(absolute_path) if isdir(join(absolute_path,f)) ]
-
-    context = {
-        'active_menu' : 'datahub',
-        'path': path,
-        'files' : files,
-        'directories' : dirs,
-    }
-    return render_to_response('datahub/browse.html',context,context_instance=RequestContext(request))
-
-def show_data(request):
-    
-    path =  request.GET['dpath']
-    absolute_path = CONTEXT['datahub-root'] + path
-    context = {
-        'active_menu' : 'datahub',
-        'path': path,
-        'base' : 'datahub-root',
-     
-    }
-    return render_to_response('datahub/show.html',context,context_instance=RequestContext(request))
- 
 
     
     

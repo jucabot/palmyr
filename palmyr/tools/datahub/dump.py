@@ -14,7 +14,7 @@ def dump_as_index_file():
     f = open(CONTEXT['correlation-index-path'],mode='w')
     
     for serie in series['hits']['hits']:
-        f.write("%s;%s\n" % (serie['_id'],cjson.encode(serie['_source']['data']['series'][0]['data'])))
+        f.write("%s;%s;%s\n" % (serie['_id'],serie['_source']['name'],cjson.encode(serie['_source']['data']['series'][0]['data'])))
     f.close()
     
     

@@ -74,8 +74,9 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
     
     predictor_data = line.split(';')
     predictor_key = predictor_data[0]
+    predictor_name = predictor_data[1]
     
-    predictor = cjson.decode(predictor_data[1])
+    predictor = cjson.decode(predictor_data[2])
     predictor = transform_serie(predictor)
     
         
@@ -130,7 +131,7 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         results[str(i)] = result
 
-    return { 'id':key, 'results': results}
+    return { 'id':key, 'results': results, 'name':predictor_name}
 
 
 def filter_correlation_results (serie): 
