@@ -10,6 +10,7 @@ import datetime
 import numpy as np
 from sklearn.svm import SVR
 from sklearn.preprocessing import scale
+from multiprocessing import Pool
 
 
 def get_date(date_str, date_format="%Y-%m-%d %H:%M:%S"):
@@ -68,7 +69,10 @@ def transform_serie(serie):
     for item in serie:
         serie_dict[item[0]] = item[1]
     return serie_dict
-    
+
+def tuple_correlation_search_map(tuple):
+    line,variable,lag_variable,kernel_variable = tuple
+    return correlation_search_map(line,variable,lag_variable,kernel_variable)
 
 def correlation_search_map(line,variable,lag_variable,kernel_variable):
     
@@ -145,6 +149,7 @@ class CorrelationSearch():
     
     context = None
     _debug = False
+    _pool = False
     _sc = None
     _index_rdd = None
     search_timeserie_data = None
@@ -156,10 +161,12 @@ class CorrelationSearch():
         self.index_file_name = self.context["correlation-index-path"]
         
         self._debug = self.context["spark-cluster"] == 'debug'
+        self._pool = self.context["spark-cluster"] == 'pool'
         
         if self._debug:
-            self._debug = True
             print "Spark in debug mode (as single threaded map)"
+        elif self._pool:
+            print "Spark in multiprocessing pool mode (as multiprocessed map)"
         else:
             self._debug = False
             self._sc = SparkContext(self.context["spark-cluster"], "Inlight/data Correlation search")
@@ -176,7 +183,16 @@ class CorrelationSearch():
             result = filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),open(self.index_file_name,mode='r')))
             
             return result
+        elif self._pool:
+            lag_variable = broadcast(lag)
+            kernel_variable = broadcast(kernel)
+            search_timeserie_data = broadcast(transform_serie(search_timeserie))
             
+            
+            pool = Pool()
+            result = filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_index(self.index_file_name,search_timeserie_data,lag_variable,kernel_variable)))
+            
+            return result
         else:
             lag_variable = self._sc.broadcast(lag)
             kernel_variable = self._sc.broadcast(kernel)
@@ -188,7 +204,7 @@ class CorrelationSearch():
 
         
     def close(self):
-        if not self._debug:
+        if not (self._debug or self._pool):
             self._sc.stop()
 
 class BroadcastVariable():
@@ -198,3 +214,11 @@ class BroadcastVariable():
     
 def broadcast(value):
     return BroadcastVariable(value)
+
+def read_index(index_file_name,search_timeserie_data,lag_variable,kernel_variable):
+    f = open(index_file_name,mode='r')
+    
+    for line in f:
+        yield line,search_timeserie_data,lag_variable,kernel_variable
+
+

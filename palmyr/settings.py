@@ -152,14 +152,14 @@ LOGGING = {
 }
 
 CONTEXT = {
-            'datahub-root' : "/home/predictiveds/Dropbox/palmyr-data/datahub",
+            #'datahub-root' : "/home/predictiveds/Dropbox/palmyr-data/datahub",
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
             'data-root' : "/home/predictiveds/Dropbox/palmyr-data/data",
-            'marketplace-data-root' : "/home/predictiveds/Dropbox/palmyr-data/marketplace_data",
+            #'marketplace-data-root' : "/home/predictiveds/Dropbox/palmyr-data/marketplace_data",
             'analysis-root' : "/home/predictiveds/Dropbox/palmyr-data/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",
-            'spark-cluster' : "debug",
+            'spark-cluster' : "pool",
             'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
            }
