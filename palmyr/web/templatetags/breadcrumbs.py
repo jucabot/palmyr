@@ -35,10 +35,10 @@ def render(parts):
         
     html = "<ul class=\"breadcrumb\">"
     for name,path in parts[:-1]:
-        name = name if name != '' else "Mes donn&eacute;es"
+        name = name if name != '' else "Mon dossier"
         html += "<li><a href=\"?path=" + path + "\">" + name + "</a> <span class=\"divider\">/</span></li>"
     name,path = parts[-1]
-    name = name if name != '' else "Mes donn&eacute;es"
+    name = name if name != '' else "Mon dossier"
     html += "<li class=\"active\">" + name  + "</li>"
     html += "</ul>"
     
