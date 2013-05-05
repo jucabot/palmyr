@@ -8,8 +8,9 @@ import datetime
 
 class SearchCommand(Command):
     
-    def _query(self,query,user_id):
-        
+    def _query(self,query,user_id,es_from=0):
+        total=0
+        took = 0
         datahub = Datahub(CONTEXT,user_id=user_id)
             
         result = datahub.get(query,"serie")
@@ -24,7 +25,7 @@ class SearchCommand(Command):
             data['name'] = result['name']
             
         else:
-            result = datahub.query(query)
+            result,total,took = datahub.query(query,es_from=es_from)
             if result is not None: #the query match a datahub entry
                 
                 if len(result) == 1:
@@ -58,21 +59,24 @@ class SearchCommand(Command):
                 data = []
                 result_type = 'serie-list'
         
-        return (result_type,data)
+        return (result_type,data,total,took)
         
     
     def search(self):
         
         query = self.ctx.params['query']
+        es_from = 0
+        if 'from' in self.ctx.params:
+            es_from = int(self.ctx.params['from'])
         
-        (result_type,data) = self._query(query, self.ctx.request.user.id)
+        (result_type,data,total,took) = self._query(query, self.ctx.request.user.id,es_from=es_from)
         
-        return self.success(type=result_type,data=data,query=query)
+        return self.success(type=result_type,data=data,query=query,total=total,took=took,es_from=es_from)
     
     def correlate(self):
         
         query = self.ctx.params['query']
-        (result_type, search_timeserie) = self._query(query, self.ctx.request.user.id)
+        (result_type, search_timeserie,total,took) = self._query(query, self.ctx.request.user.id)
         
         start = datetime.datetime.now()
         cs = CorrelationSearch(CONTEXT)
@@ -95,7 +99,7 @@ class SearchCommand(Command):
         serie_id = self.ctx.params['id']
         name = self.ctx.params['name']
         
-        (result_type,data) = self._query(serie_id, self.ctx.request.user.id)
+        (result_type,data,total,took) = self._query(serie_id, self.ctx.request.user.id)
         
         try:
             workspace = Workspace.objects.get(value=serie_id,user=self.ctx.request.user)
@@ -112,7 +116,11 @@ class SearchCommand(Command):
         try:
             workspace = Workspace.objects.get(id=id_workspace,user=self.ctx.request.user)
             workspace.delete()
+            
+            #todo supprimer de l'index si donnees privees
+            
+            
         except Workspace.DoesNotExist:
-            pass
+            return self.error(message="Espace de travail %s inexistant" % id_workspace)
         return self.success()
         

@@ -19,20 +19,21 @@ class Datahub():
         else:
             return "user_%s" % (self.user_id)  
         
-    def query(self,name,type_name="serie"):
+    def query(self,name,type_name="serie",es_from=0):
         if self.user_id is None:
             q = '%s AND owner:public' % name
         else:
             q = '%s AND (owner:public OR owner:"%s")' % (name,self._get_user_id())
-        results= self._es.search(q,index=self.index_name,doc_type=type_name)
+        results= self._es.search(q,index=self.index_name,doc_type=type_name,es_from=es_from)
         
         if results['hits']['total'] > 0:
     
-            return map(lambda s : (s['_id'],s['_source']),results['hits']['hits'])
+            return (map(lambda s : (s['_id'],s['_source']),results['hits']['hits']),results['hits']['total'],results['took'])
         else:
-            return None
+            return None,results['hits']['total'],results['took']
         
     def get(self,key,type_name="serie"):
+        result={}
         try:
             result = self._es.get(self.index_name,type_name,id=key)
             if result['_source']['owner'] == 'public' or result['_source']['owner'] == self._get_user_id():
