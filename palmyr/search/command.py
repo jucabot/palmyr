@@ -8,9 +8,7 @@ import datetime
 
 class SearchCommand(Command):
     
-    def test(self):
-        pass
-    
+
     def _query(self,query,user_id,es_from=0):
         total=0
         took = 0
