@@ -1,9 +1,11 @@
-from palmyrdb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE
+from palmyrdb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE,\
+    DATE_TYPE
 
 
 class FeatureQuery():
     feature = None
     filter_function = None
+    
     
     def __init__(self,feature,filter_function=None):
         self.feature = feature
@@ -11,7 +13,7 @@ class FeatureQuery():
         
     def get_frequency_distribution(self):
         df_dict = self.feature.get_frequency_distribution(filter_function=self.filter_function)
-            
+        """  
         if self.feature.has_class():
             df = map(lambda (kv) : [kv[0],kv[1]],df_dict.items())
         else:
@@ -19,6 +21,11 @@ class FeatureQuery():
             df =  {
                     'categories' : df_dict.keys(),
                     'series' :  [{ 'name' : self.feature.name, 'data' : df_dict.values() }]
+            }
+        """    
+        df =  {
+                    'categories' : sorted(df_dict.keys()),
+                    'series' :  [{ 'name' : self.feature.name, 'data' : map(lambda (k,v):v,sorted(df_dict.items())) }]
             }
         return df
 
@@ -64,6 +71,21 @@ class AnalysisQuery():
                             }]
         return result
     
+    def query_as_timeline(self):
+        result = {}
+                       
+        result['label_x'] =  self.fx.name
+        result['label_y'] =  self.fy.name
+        #result['categories'] =  self.fx.classes
+        
+        result['series'] = [{
+                            'name' : self.fy.name,
+                            'data' : self.fy.get_metric_by( self.fx,metric_function=sum,filter_function=self.filter_function)
+                            }]
+        
+        return result
+    
+    
     def correlate(self):
        
         if self.fx.has_class() or self.fx.get_type() == TEXT_TYPE:
@@ -75,6 +97,13 @@ class AnalysisQuery():
                 return 'stacked-bar',self.query_as_stacked_bar()
             else:
                 return None,None
+        elif self.fx.get_type() == DATE_TYPE:
+            if self.fy.has_class(): #stacked bar
+                return 'stacked-bar',self.query_as_stacked_bar()
+            elif self.fy.get_type() == INT_TYPE or self.fy.get_type() == FLOAT_TYPE: #box plot
+                return 'timeline',self.query_as_timeline()
+            
+        
         else:
             if (self.fx.get_type() == INT_TYPE or self.fx.get_type() == FLOAT_TYPE) and (self.fy.get_type() == INT_TYPE or self.fy.get_type() == FLOAT_TYPE):
                 return 'scatter',self.query_as_scatter_plot()

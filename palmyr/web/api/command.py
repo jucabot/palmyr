@@ -8,7 +8,8 @@ from web.api.nlquery import nlq_parse
 from web.api.analysis import AnalysisQuery, FeatureQuery
 from pickle import dump
 from palmyrdb.script import compile_func_code
-from palmyrdb.featureset import FeatureTable
+from api.datahub import Datahub
+from django.core.cache import cache
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -20,24 +21,13 @@ def error(message):
 
 
 
+
+"""
 class GeneralCommand():
     ctx = None
     def __init__(self,context):
         self.ctx = context
-    
-    def get_content(self):
-        if 'base' in self.ctx.params:
-            if 'key' in self.ctx.params:
-                abs_path = CONTEXT[self.ctx.params['base']] + self.ctx.params['key']
-                f = open (abs_path,mode='r')
-                content = json.load(f)
-                f.close()
-                return success(data=content)
-            else:
-                return error('No key defined')
-        else:
-            return error('No base directory defined')
-    
+        
     def create_analysis(self):
         if 'data_id' in self.ctx.params:
             if 'base' in self.ctx.params:
@@ -66,8 +56,7 @@ class GeneralCommand():
             
         else:
             return error('No data_id directory defined')
-    
-
+""" 
 
 class FeatureTableCommand():
     ftname = None
@@ -176,14 +165,14 @@ class FeatureTableCommand():
             return error('No feature code defined')
 
         name = self.ctx.params['name']
-        type = self.ctx.params['type']
+        type_name = self.ctx.params['type']
         
         tc = TypeConverter()
         if not tc.is_supported_type(type):
-            return error('%s type not supported' % type)
+            return error('%s type not supported' % type_name)
         
         code = self.ctx.params['code']
-        self.ftable.add_feature(name,type,function_code=code)
+        self.ftable.add_feature(name,type_name,function_code=code)
         
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
@@ -313,13 +302,15 @@ class FeatureTableCommand():
         self.ftable.apply_prediction(model_name,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +input_filename,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +output_filename)
         
         return success(message="Predictions saved to %s" % output_filename)
-    
-    
-    def nl_query(self):
-        if 'query' not  in self.ctx.params:
-            query = ""
-        else:
-            query = self.ctx.params['query']
+
+    def _query(self,query):
+        
+        #check if cached
+        cached_result = cache.get(self._get_cache_key())
+        if cached_result is not None:
+            return cached_result
+        
+        
         
         feature_y, feature_x, options = nlq_parse(query,self.ftable.get_feature_names())
         
@@ -349,13 +340,41 @@ class FeatureTableCommand():
             analysis.filter_function = filter_function
             result_type,data = analysis.correlate()
             
-        else: #show all
+        else: #search in datahub or show all
+            
             result_type = 'table'
             if 'num_page' in options:
                 num_page = int(options['num_page'])
             else:
                 num_page = 0
             data = self.ftable.get_datatable(from_page=num_page,filter_function=filter_function)
+
+        
+        cache.set(self._get_cache_key(),(result_type,data),60*60*24*10)
+        return (result_type,data)
+    
+    def test(self):
+        pass
+    def _get_cache_key(self):
+        def string_to_int(s):
+            ord3 = lambda x : '%.3d' % ord(x)
+            return int(''.join(map(ord3, s)))
+                
+        if 'filter' in self.ctx.params:
+            cache_key = "%s|%s|%s|%s" % (self.ctx.user.id,string_to_int(self.ctx.params['ftable']),string_to_int(self.ctx.params['query']),string_to_int(self.ctx.params['filter']))
+        else:
+            cache_key = "%s|%s|%s" % (self.ctx.user.id,string_to_int(self.ctx.params['ftable']),string_to_int(self.ctx.params['query']))
+        return cache_key
+        
+    
+    def nl_query(self):
+        if 'query' not  in self.ctx.params:
+            query = ""
+        else:
+            query = self.ctx.params['query']
+        
+        (result_type,data) = self._query(query)
+        
         return success(type=result_type,data=data,query=query)
     
     def add_filter(self):
@@ -381,17 +400,29 @@ class FeatureTableCommand():
         if name not  in self.ftable.filters:
             return error('Filter %s doesn\'t exist' % name)
 
-        filter = self.ftable.filters[name]
+        filter_name = self.ftable.filters[name]
         
-        self.ftable.current_filter = filter
+        self.ftable.current_filter = filter_name
         
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
-        return success(data=filter )
+        return success(data=filter_name )
     def clear_filter(self):
         
         self.ftable.current_filter = None
         
+        self.ctx.set_feature_table(self.ftname, self.ftable)
+
+        return success()
+    def remove_filter(self):
+        
+        name = self.ctx.params['name']
+        
+        if name not  in self.ftable.filters:
+            return error('Filter %s doesn\'t exist' % name)
+
+        del self.ftable.filters[name]
+                
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
         return success()
@@ -400,7 +431,6 @@ class FeatureTableCommand():
         return success(data=self.ftable.get_properties())
     
     def remove_model(self):
-        
         if 'model' not  in self.ctx.params:
             return error('No model name defined')
         model_name = self.ctx.params['model']
@@ -409,4 +439,21 @@ class FeatureTableCommand():
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
         return success()
+    
+    
+    def index_query(self):
+        if 'query' not  in self.ctx.params:
+            return error('No query defined')
+        else:
+            query = self.ctx.params['query']
+        
+        (result_type,data) = self._query(query)
+        
+        datahub = Datahub(CONTEXT,user_id=self.ctx.user.id)
+        serie_description = "%s dans %s" % (query,self.ftname)
+        id_index = datahub.index(query,result_type,data, description=serie_description)
+        
+        return success(id=id_index)
+        
+    
     

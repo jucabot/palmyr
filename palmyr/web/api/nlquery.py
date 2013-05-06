@@ -28,7 +28,7 @@ def nlq_parse(query,feature_names):
     elif ',' in cmd.lower():
         f_list = cmd.strip().lower().split(',')
     elif '^' in cmd.lower():
-        f_list = cmd.strip().lower().split(',')
+        f_list = cmd.strip().lower().split('^')
     else:
         f_list = cmd.strip().lower().split(' by ')
     f_list = [f.strip() for f in f_list]
