@@ -353,8 +353,7 @@ class FeatureTableCommand():
         cache.set(self._get_cache_key(),(result_type,data),60*60*24*10)
         return (result_type,data)
     
-    def test(self):
-        pass
+    
     def _get_cache_key(self):
         def string_to_int(s):
             ord3 = lambda x : '%.3d' % ord(x)
