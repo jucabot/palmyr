@@ -3,8 +3,7 @@ correlation search engine
 """
 
 from pyspark.context import SparkContext
-import os
-import json
+
 import cjson
 import datetime
 import numpy as np
