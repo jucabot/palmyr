@@ -1,3 +1,5 @@
+
+
 from django.http import HttpResponse
 import json
 from web.views import get_user_root
@@ -118,10 +120,10 @@ class FeatureTableCommand():
             dump(self.ftable,f)
             f.close()
             
-            return success(message="%s stored successfully" % filename) 
+            return success(message="%s enregistr&eacute; avec succ&egrave;s" % filename) 
         else:
             self.ftable.save(get_user_root(self.ctx.request.user,CONTEXT['analysis-root'])+os.sep + self.ctx.params['dpath'])
-            return success(message="%s stored successfully" % self.ctx.params['dpath'])
+            return success(message="%s enregistr&eacute; avec succ&egrave;s" % self.ctx.params['dpath'])
     
     def use_feature(self):
         if 'feature_name' in self.ctx.params:
@@ -176,7 +178,7 @@ class FeatureTableCommand():
         
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
-        return success(message="Virtual feature %s added successfully" % name )
+        return success(message="Feature virtuelle %s ajout&eacute;e avec succ&egraves" % name )
     
     def get_feature(self):
         if 'name' not  in self.ctx.params:
@@ -217,7 +219,7 @@ class FeatureTableCommand():
         feature.update_feature()
         self.ctx.set_feature_table(self.ftname, self.ftable)
         
-        return success(message="Feature %s successfully updated" % name)
+        return success(message="Feature %s mise a&agrave; jour avec succ&agrave;s" % name)
      
     def remove_feature(self):
         if 'name' not  in self.ctx.params:
@@ -231,7 +233,7 @@ class FeatureTableCommand():
         
         self.ctx.set_feature_table(self.ftname, self.ftable)
         
-        return success(message="Feature %s successfully removed" % name)
+        return success(message="Feature %s supprim&eacute;e avec succ&grave;s" % name)
     
     def build_model(self):
         if 'filter' in self.ctx.params:
@@ -301,7 +303,7 @@ class FeatureTableCommand():
         
         self.ftable.apply_prediction(model_name,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +input_filename,get_user_root(self.ctx.request.user,CONTEXT['data-root'])+os.sep +output_filename)
         
-        return success(message="Predictions saved to %s" % output_filename)
+        return success(message="Pr&eacute;dictions sauv&eacute;es dans %s" % output_filename)
 
     def _query(self,query):
         
@@ -389,7 +391,7 @@ class FeatureTableCommand():
         
         self.ctx.set_feature_table(self.ftname, self.ftable)
 
-        return success(message="Filter %s added successfully" % name )
+        return success(message="Filtre %s cr&eacute;&eacute; avec succ&egrave;s" % name )
     def select_filter(self):
         if 'name' not  in self.ctx.params:
             return error('No name defined')
