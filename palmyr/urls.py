@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'web.views.home', name='home'),
+    url(r'^$', 'search.views.search', name='home'),
     # url(r'^palmyr/', include('palmyr.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
@@ -18,15 +18,15 @@ urlpatterns = patterns('',
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name="login"),
     url(r'^accounts/logout_then_login', 'django.contrib.auth.views.logout_then_login',name="logout"),
     
-    url(r'^datasource/browse$', 'web.views.browse_datasource', name='browse-datasource'),
-    url(r'^datasource/upload$', 'web.views.upload_file', name='upload-datasource'),
-    url(r'^analysis/browse$', 'web.views.browse_analysis', name='browse-analysis'),
-    url(r'^analysis/create$', 'web.views.create_analysis', name='create-analysis'),
-    url(r'^analysis/open$', 'web.views.open_analysis', name='open-analysis'),
-    url(r'^analysis/summary$', 'web.views.summary_analysis', name='summary-analysis'),
-    url(r'^analysis/correlate$', 'web.views.correlate_analysis', name='correlate-analysis'),
+    url(r'^datasource/browse$', 'analyze.views.browse_datasource', name='browse-datasource'),
+    url(r'^datasource/upload$', 'analyze.views.upload_file', name='upload-datasource'),
+    url(r'^analysis/browse$', 'analyze.views.browse_analysis', name='browse-analysis'),
+    url(r'^analysis/create$', 'analyze.views.create_analysis', name='create-analysis'),
+    url(r'^analysis/open$', 'analyze.views.open_analysis', name='open-analysis'),
+    url(r'^analysis/summary$', 'analyze.views.summary_analysis', name='summary-analysis'),
+    url(r'^analysis/correlate$', 'analyze.views.correlate_analysis', name='correlate-analysis'),
     #url(r'^analysis/model$', 'web.views.model_analysis', name='model-analysis'),
-    url(r'^analysis/api$', 'web.api.views.api_analysis', name='api-analysis'),
+    url(r'^analysis/api$', 'analyze.views.api_analysis', name='api-analysis'),
     #url(r'^datahub/browse$', 'web.views.browse_datahub', name='browse-datahub'),
     #url(r'^datahub/show$', 'web.views.show_data', name='show-data'),
     #url(r'^api$', 'web.api.views.api_general', name='api-general'),

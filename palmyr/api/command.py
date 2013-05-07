@@ -1,5 +1,18 @@
 from django.http import HttpResponse
 import cjson
+import json
+
+def success(**kwargs):
+    response = { "status":'success'}
+    response.update(kwargs)
+    try:
+        return HttpResponse(cjson.encode(response))
+    except:
+        return HttpResponse(json.dumps(response))
+    
+def error(message):
+    return HttpResponse(cjson.encode({ "status":"error" , "message":"%s" % str(message)}))
+
 
 
 class Command():
@@ -7,11 +20,13 @@ class Command():
     def __init__(self,context):
         self.ctx = context
     
-    
     def success(self,**kwargs):
         response = { "status":'success'}
         response.update(kwargs)
-        return HttpResponse(cjson.encode(response))
-
+        try:
+            return HttpResponse(cjson.encode(response))
+        except:
+            return HttpResponse(json.dumps(response))
+    
     def error(self,message):
         return HttpResponse(cjson.encode({ "status":"error" , "message":"%s" % str(message)}))
