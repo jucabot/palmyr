@@ -6,7 +6,7 @@ from django.template.context import RequestContext
 from settings import CONTEXT
 from search.models import Domain
 from django.contrib.auth.models import User
-from api.context import UserContext
+from common.context import UserContext
 from search.command import SearchCommand
 import traceback
 

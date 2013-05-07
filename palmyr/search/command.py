@@ -1,9 +1,9 @@
-from api.command import Command
+from common.command import Command
 from settings import CONTEXT
-from api.datahub import Datahub
+from common.datahub import Datahub
 from string import lower
 from search.models import Workspace
-from api.correlation import CorrelationSearch
+from common.correlation import CorrelationSearch
 import datetime
 
 class SearchCommand(Command):

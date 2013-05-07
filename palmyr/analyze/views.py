@@ -13,8 +13,8 @@ from pickle import load
 from django.contrib.auth.decorators import login_required
 from command import FeatureTableCommand
 import traceback
-from api.command import error
-from api.context import UserContext
+from common.command import error
+from common.context import UserContext
 
 
 
@@ -246,7 +246,7 @@ def correlate_analysis(request):
 
     
 @login_required
-def api_analysis(request):
+def api(request):
     
     ftname = request.GET['ftable']
     cmd = request.GET['cmd']

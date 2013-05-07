@@ -7,9 +7,9 @@ from query.nlquery import nlq_parse
 from query.analysis import AnalysisQuery, FeatureQuery
 from pickle import dump
 from palmyrdb.script import compile_func_code
-from api.datahub import Datahub
+from common.datahub import Datahub
 from django.core.cache import cache
-from api.command import Command, success
+from common.command import Command, success
 
 class FeatureTableCommand(Command):
     ftname = None
@@ -309,9 +309,12 @@ class FeatureTableCommand(Command):
     
     def _get_cache_key(self):
         def string_to_int(s):
-            ord3 = lambda x : '%.3d' % ord(x)
-            return int(''.join(map(ord3, s)))
-                
+            if len(s) > 0:
+                ord3 = lambda x : '%.3d' % ord(x)
+                return int(''.join(map(ord3, s)))
+            else:
+                return 0
+            
         if 'filter' in self.ctx.params:
             cache_key = "%s|%s|%s|%s" % (self.ctx.user.id,string_to_int(self.ctx.params['ftable']),string_to_int(self.ctx.params['query']),string_to_int(self.ctx.params['filter']))
         else:
