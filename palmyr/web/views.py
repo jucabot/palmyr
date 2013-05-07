@@ -139,15 +139,20 @@ def create_analysis(request):
 def open_analysis(request):
     
     dpath = request.GET["dpath"]
-    analysis_path = get_user_root(request.user,CONTEXT['analysis-root']) + dpath
     
-    #Create feature table from dpath file
-    f = open(analysis_path,'rb')
-    ftable = load(f)
-    f.close()
-
-    #save feature table in session as user cache
-    request.session['feature_tables:'+dpath] = ftable
+    if 'feature_tables:'+dpath in request.session:
+        ftable = request.session['feature_tables:'+dpath]
+    else:
+    
+        analysis_path = get_user_root(request.user,CONTEXT['analysis-root']) + dpath
+        
+        #Create feature table from dpath file
+        f = open(analysis_path,'rb')
+        ftable = load(f)
+        f.close()
+    
+        #save feature table in session as user cache
+        request.session['feature_tables:'+dpath] = ftable
     
     name = dpath.split(os.sep)[-1]
     
