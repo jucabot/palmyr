@@ -450,6 +450,8 @@ class FeatureTableCommand():
         
         datahub = Datahub(CONTEXT,user_id=self.ctx.user.id)
         serie_description = "%s dans %s" % (query,self.ftname)
+        
+        
         id_index = datahub.index(query,result_type,data, description=serie_description)
         
         return success(id=id_index)

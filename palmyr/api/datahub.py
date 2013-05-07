@@ -19,7 +19,7 @@ class Datahub():
         else:
             return "user_%s" % (self.user_id)  
         
-    def query(self,name,type_name="serie",es_from=0):
+    def query(self,name,type_name="_all",es_from=0):
         if self.user_id is None:
             q = '%s AND owner:public' % name
         else:
@@ -32,7 +32,7 @@ class Datahub():
         else:
             return None,results['hits']['total'],results['took']
         
-    def get(self,key,type_name="serie"):
+    def get(self,key,type_name="_all"):
         result={}
         try:
             result = self._es.get(self.index_name,type_name,id=key)
@@ -58,7 +58,7 @@ class Datahub():
          "data" : data
          }
         
-        id = self._es.index(self.index_name, "serie", serie)
+        id = self._es.index(self.index_name, display_type, serie)
 
         return id['_id']
         

@@ -14,7 +14,7 @@ class SearchCommand(Command):
         took = 0
         datahub = Datahub(CONTEXT,user_id=user_id)
             
-        result = datahub.get(query,"serie")
+        result = datahub.get(query)
         
         if result is not None:
             result_type = result['display']

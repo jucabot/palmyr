@@ -7,9 +7,18 @@ import cjson
 
 def delete_all():
     es = ElasticSearch(CONTEXT['datahub-store'])
-    es.delete_index("datahub")
+    es.delete_index(CONTEXT['datahub-index'])
 
-
+def create_index():
+    es = ElasticSearch(CONTEXT['datahub-store'])
+    settings = {'index' : 
+                    {'mapping': 
+                        {'ignore_malformed':True}
+                    }
+                }
+    es.create_index(CONTEXT['datahub-index'],settings )
+    
+    
 def load(filename,index_name,type_name,category,zone="France",sep=";",display="timeline", source='',description=''):
     
     f = open(filename,mode='r')
@@ -35,7 +44,7 @@ def load(filename,index_name,type_name,category,zone="France",sep=";",display="t
          'description' : description % (key),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
-        es.index(index_name, type_name, serie)
+        es.index(index_name, display, serie)
 
     
     es.refresh(index_name)
@@ -64,7 +73,7 @@ def load2(filename,index_name,type_name,category,zone="France",sep=";",display="
          'description' : description % (key),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
-        es.index(index_name, type_name, serie)
+        es.index(index_name, display, serie)
 
     
     es.refresh(index_name)
@@ -92,7 +101,7 @@ def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep
      'description' : description % (name),
      "data" : { 'categories': map(lambda item : item[0],categories), 'series': [{'data': map(lambda item : item[1],categories)}]  }
      }
-    es.index(index_name, type_name, serie)
+    es.index(index_name, display, serie)
 
     
     es.refresh(index_name)
@@ -120,15 +129,16 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
      'description' : description % (key),
      "data" : { 'categories' : categories.keys(), 'series' : [{'data' :  categories.values()}] }
      }
-    es.index(index_name, type_name, serie)
+    es.index(index_name, display, serie)
 
     
     es.refresh(index_name)
     f.close()
 
-#delete_all() 
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/all_socio_economic.txt","datahub","serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/gtrends.txt","datahub","serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
-load_wordcloud("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_count_full.txt.top200","datahub","serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
-load_pie("/home/predictiveds/Dropbox/palmyr-data/import datahub/forum_count_full.csv","datahub","serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_series_full.top200.txt","datahub","serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
+delete_all()
+#create_index()
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
+load_wordcloud("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
+load_pie("/home/predictiveds/Dropbox/palmyr-data/import datahub/forum_count_full.csv",CONTEXT['datahub-index'],"serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
