@@ -7,9 +7,9 @@ def dump_as_index_file():
     
     es = ElasticSearch(CONTEXT['datahub-store'])
     
-    total = es.count("owner:public AND display:timeline",index=CONTEXT['datahub-index'],doc_type='serie')
+    total = es.count("owner:public AND display:timeline",index=CONTEXT['datahub-index'],doc_type='_all')
     
-    series = es.search("owner:public AND display:timeline",index=CONTEXT['datahub-index'],size=total['count'],doc_type='serie')
+    series = es.search("owner:public AND display:timeline",index=CONTEXT['datahub-index'],size=total['count'],doc_type='_all')
     
     f = open(CONTEXT['correlation-index-path'],mode='w')
     
