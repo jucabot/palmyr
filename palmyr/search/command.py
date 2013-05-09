@@ -98,7 +98,7 @@ class SearchCommand(Command):
     
     def open_workspace(self):
         
-        serie_id = self.ctx.params['id']
+        serie_id = self.ctx.params['serie_id']
         name = self.ctx.params['name']
         
         (result_type,data,total,took) = self._query(serie_id, self.ctx.request.user.id)
@@ -109,7 +109,7 @@ class SearchCommand(Command):
             workspace = Workspace(name=name,user=self.ctx.request.user,serie_id=serie_id)
             workspace.save()
         
-        return self.success(id=serie_id,name=name,data=data,options=cjson.decode(workspace.options))
+        return self.success(id=workspace.id,serie_id=serie_id,name=name,data=data,options=cjson.decode(workspace.options))
     
     def remove_workspace(self):
         
@@ -119,10 +119,24 @@ class SearchCommand(Command):
             workspace = Workspace.objects.get(id=id_workspace,user=self.ctx.request.user)
             workspace.delete()
             
-            #todo supprimer de l'index si donnees privees
-            
             
         except Workspace.DoesNotExist:
             return self.error(message="Espace de travail %s inexistant" % id_workspace)
         return self.success()
+    
+    def save_workspace(self):
+        
+        id_workspace = self.ctx.params['id']
+        options = cjson.decode(self.ctx.params['options'])
+        
+        try:
+            workspace = Workspace.objects.get(id=id_workspace,user=self.ctx.request.user)
+            
+            workspace.options = cjson.encode(options)
+            workspace.save()
+            
+            
+        except Workspace.DoesNotExist:
+            return self.error(message="Espace de travail %s inexistant" % id_workspace)
+        return self.success(message="Espace de travail enregistr&eacute; avec succ&egrave;s")
         

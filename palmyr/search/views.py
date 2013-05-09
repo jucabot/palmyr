@@ -28,6 +28,8 @@ def api(request):
             return cmd.open_workspace()
         elif cmd_op == 'remove-workspace':
             return cmd.remove_workspace()
+        elif cmd_op == 'save-workspace':
+            return cmd.save_workspace()
         else:
             return cmd.error('Undefined api command %s' % cmd_op)
 
