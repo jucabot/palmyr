@@ -5,6 +5,7 @@ from string import lower
 from search.models import Workspace
 from common.correlation import CorrelationSearch
 import datetime
+import cjson
 
 class SearchCommand(Command):
     
@@ -92,7 +93,7 @@ class SearchCommand(Command):
         if self.ctx.request.user.is_authenticated():
             workspace_set = self.ctx.request.user.workspace_set.all()
             for workspace in workspace_set:
-                workspaces.append({'id':workspace.id,'name':workspace.name, 'value':workspace.value,'icon_path':workspace.icon_path })
+                workspaces.append({'id':workspace.id,'name':workspace.name, 'serie_id':workspace.serie_id,'icon_path':workspace.icon_path,'options':workspace.options })
         return self.success(workspaces=workspaces)
     
     def open_workspace(self):
@@ -103,12 +104,12 @@ class SearchCommand(Command):
         (result_type,data,total,took) = self._query(serie_id, self.ctx.request.user.id)
         
         try:
-            workspace = Workspace.objects.get(value=serie_id,user=self.ctx.request.user)
+            workspace = Workspace.objects.get(serie_id=serie_id,user=self.ctx.request.user)
         except Workspace.DoesNotExist:
-            workspace = Workspace(name=name,user=self.ctx.request.user,value=serie_id)
+            workspace = Workspace(name=name,user=self.ctx.request.user,serie_id=serie_id)
             workspace.save()
         
-        return self.success(id=serie_id,name=name,data=data)
+        return self.success(id=serie_id,name=name,data=data,options=cjson.decode(workspace.options))
     
     def remove_workspace(self):
         

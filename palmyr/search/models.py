@@ -17,9 +17,10 @@ class Domain(models.Model):
     
 class Workspace(models.Model):
     name = models.CharField(max_length=500)
-    value = models.TextField()
+    serie_id = models.CharField(max_length=500)
     user = models.ForeignKey(User)
     icon_path = models.CharField(max_length=200,default="default.png")
+    options = models.TextField(default="{}")
     
     def __unicode__(self):
         return self.name
