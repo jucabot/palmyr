@@ -10,6 +10,7 @@ import numpy as np
 from sklearn.svm import SVR
 from sklearn.preprocessing import scale
 from multiprocessing import Pool
+import math
 
 
 def get_date(date_str, date_format="%Y-%m-%d %H:%M:%S"):
@@ -50,11 +51,20 @@ def lag_serie(serie,month_lag):
         date = read_date(key)
         
         if date != None:
-            delta = datetime.timedelta(month_lag * 365/12)
             
-            date = date - delta
+            if date.month - month_lag > 0:
+                lagged_date = str(date.year) + '-' + "%02d" % (date.month - month_lag) + '-' + "%02d" % (date.day)
             
-            lagged_serie[format_date(date)] = serie[key]
+            else:
+                delta_year = int(abs(math.floor((date.month - month_lag)/12)))
+                if (date.month - month_lag) == 0:
+                    delta_month = 1
+                else:
+                    delta_month = 12 - abs(date.month - month_lag)%12
+                lagged_date = str(date.year-delta_year) + '-' + "%02d" % (delta_month) + '-' + "%02d" %(date.day)
+            
+            lagged_serie[lagged_date] = serie[key]
+            
     
     return lagged_serie
 
@@ -97,7 +107,7 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         (list_key,list_variable, list_predictor) = serie_join(variable.value, lagged_predictor)
         
-        if len(list_predictor) < 10:
+        if len(list_predictor) < 12:
             
             results[str(i)] = {'r2' : 0}
             continue
@@ -118,10 +128,11 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         #predicted_y = list(svr_rbf.predict(original_X))
         
+        """
         if r_squared < 0.5:
             results[str(i)] = {'r2' : 0}
             continue
-        
+        """
         
         result = {}
         

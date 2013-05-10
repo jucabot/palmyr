@@ -159,6 +159,7 @@ CONTEXT = {
             #'marketplace-data-root' : "/home/predictiveds/Dropbox/palmyr-data/marketplace_data",
             'analysis-root' : "/home/predictiveds/Dropbox/palmyr-data/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",
+            #'spark-cluster' : "debug",
             'spark-cluster' : "pool",
             'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
