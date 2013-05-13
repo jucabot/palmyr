@@ -9,14 +9,7 @@ def delete_all():
     es = ElasticSearch(CONTEXT['datahub-store'])
     es.delete_index(CONTEXT['datahub-index'])
 
-def create_index():
-    es = ElasticSearch(CONTEXT['datahub-store'])
-    settings = {'index' : 
-                    {'mapping': 
-                        {'ignore_malformed':True}
-                    }
-                }
-    es.create_index(CONTEXT['datahub-index'],settings )
+
     
     
 def load(filename,index_name,type_name,category,zone="France",sep=";",display="timeline", source='',description=''):
@@ -135,10 +128,16 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
     es.refresh(index_name)
     f.close()
 
+
+    
+    es.refresh(index_name)
+    f.close()
+
+
 delete_all()
-#create_index()
+
 load("/home/predictiveds/Dropbox/palmyr-data/import datahub/all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
 load("/home/predictiveds/Dropbox/palmyr-data/import datahub/gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
 load_wordcloud("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
 load_pie("/home/predictiveds/Dropbox/palmyr-data/import datahub/forum_count_full.csv",CONTEXT['datahub-index'],"serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
+load("/home/predictiveds/Dropbox/palmyr-data/import datahub/labelled_word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
