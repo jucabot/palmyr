@@ -8,9 +8,11 @@ import cjson
 import datetime
 import numpy as np
 from sklearn.svm import SVR
-from sklearn.preprocessing import scale
+from sklearn.preprocessing import scale,normalize
 from multiprocessing import Pool
 import math
+from common.datahub import Datahub
+from numpy.ma.core import mean, sqrt
 
 
 def get_date(date_str, date_format="%Y-%m-%d %H:%M:%S"):
@@ -42,6 +44,17 @@ def serie_join(serie1, serie2):
             list2.append(serie2[key])
     
     return (list_pivot, list1, list2)
+
+def serie_std(serie):
+    serie_mean = mean(serie)
+    serie_std = []
+    std = 0.0
+    for value in serie:
+        std += pow(value - serie_mean, 2)
+    std = sqrt(std/(len(serie)-1))
+    for value in serie:
+        serie_std.append((value-serie_mean)/std)
+    return serie_std
 
 def lag_serie(serie,month_lag):
     
@@ -107,19 +120,21 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         (list_key,list_variable, list_predictor) = serie_join(variable.value, lagged_predictor)
         
-        if len(list_predictor) < 12:
+        
+        if len(list_predictor) < 6:
             
             results[str(i)] = {'r2' : 0}
             continue
         
+        
         y = np.array(list_variable,ndmin=1)
         
-        y = scale(y)
+        y = serie_std(y)
 
         X = np.array(list_predictor,ndmin=2)
         X = X.reshape((-1,1))
         
-        X = scale(X)
+        X = serie_std(X)
         
         clf = SVR(kernel=kernel_variable.value)
         clf.fit(X, y)
@@ -128,11 +143,11 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         #predicted_y = list(svr_rbf.predict(original_X))
         
-        """
+        
         if r_squared < 0.5:
             results[str(i)] = {'r2' : 0}
             continue
-        """
+        
         
         result = {}
         
@@ -164,10 +179,11 @@ class CorrelationSearch():
     _index_rdd = None
     search_timeserie_data = None
     index_file_name = None
+    user = None
     
-    def __init__(self,context):
+    def __init__(self,context,user):
         self.context = context
-        
+        self.user = user
         self.index_file_name = self.context["correlation-index-path"]
         
         self._debug = self.context["spark-cluster"] == 'debug'
@@ -192,6 +208,10 @@ class CorrelationSearch():
             
             result = filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),open(self.index_file_name,mode='r')))
             
+            #expand with user series correlation
+            dh = Datahub(self.context,user_id=self.user.id)
+            result.extend(filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),dh.get_user_series())))
+            
             return result
         elif self._pool:
             lag_variable = broadcast(lag)
@@ -202,6 +222,11 @@ class CorrelationSearch():
             pool = Pool()
             result = filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_index(self.index_file_name,search_timeserie_data,lag_variable,kernel_variable)))
             
+            #expand with user series correlation
+            dh = Datahub(self.context,user_id=self.user.id)
+            result.extend(filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_from_list(dh.get_user_series(),search_timeserie_data,lag_variable,kernel_variable))))
+            
+            
             return result
         else:
             lag_variable = self._sc.broadcast(lag)
@@ -210,6 +235,18 @@ class CorrelationSearch():
             
             search_result_rdd = self._index_rdd.map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable))
             search_result =  search_result_rdd.filter(filter_correlation_results).collect()
+            
+            pool = Pool()
+            lag_variable = broadcast(lag)
+            kernel_variable = broadcast(kernel)
+            search_timeserie_data = broadcast(transform_serie(search_timeserie))
+            
+            #expand with user series correlation
+            dh = Datahub(self.context,user_id=self.user.id)
+            search_result.extend(filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_from_list(dh.get_user_series(),search_timeserie_data,lag_variable,kernel_variable))))
+            
+            
+            
             return search_result
 
         
@@ -229,6 +266,11 @@ def read_index(index_file_name,search_timeserie_data,lag_variable,kernel_variabl
     f = open(index_file_name,mode='r')
     
     for line in f:
+        yield line,search_timeserie_data,lag_variable,kernel_variable
+
+def read_from_list(iter_list,search_timeserie_data,lag_variable,kernel_variable):
+   
+    for line in iter_list:
         yield line,search_timeserie_data,lag_variable,kernel_variable
 
 

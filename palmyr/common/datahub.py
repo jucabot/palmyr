@@ -1,4 +1,5 @@
 from pyelasticsearch import ElasticSearch,ElasticHttpNotFoundError
+import cjson
 
 class Datahub():
     
@@ -61,4 +62,14 @@ class Datahub():
         id = self._es.index(self.index_name, display_type, serie)
 
         return id['_id']
+    
+    def get_user_series(self):
+        series = []
+        q = 'owner:%s' % (self._get_user_id())
+        results = self._es.search(q,index=self.index_name,doc_type='_all',es_from=0,size=999)
+        
+        series = map(lambda serie : '%s;%s;%s' % (serie['_id'],serie['_source']['name'],cjson.encode(serie['_source']['data']['series'][0]['data'])),results['hits']['hits'])
+        
+        return series
+        
         
