@@ -311,15 +311,15 @@ class FeatureTableCommand(Command):
         def string_to_int(s):
             if len(s) > 0:
                 ord3 = lambda x : '%.3d' % ord(x)
-                return int(''.join(map(ord3, s)))
+                return hash(''.join(map(ord3, s)))
             else:
                 return 0
             
         if 'filter' in self.ctx.params:
-            cache_key = "%s|%s|%s|%s" % (self.ctx.user.id,string_to_int(self.ctx.params['ftable']),string_to_int(self.ctx.params['query']),string_to_int(self.ctx.params['filter']))
+            cache_key = "%s|%s|%s|%s" % (self.ctx.user.id,self.ctx.params['ftable'],self.ctx.params['query'],self.ctx.params['filter_name'])
         else:
-            cache_key = "%s|%s|%s" % (self.ctx.user.id,string_to_int(self.ctx.params['ftable']),string_to_int(self.ctx.params['query']))
-        return cache_key
+            cache_key = "%s|%s|%s" % (self.ctx.user.id,self.ctx.params['ftable'],self.ctx.params['query'])
+        return string_to_int(cache_key)
         
     
     def nl_query(self):
