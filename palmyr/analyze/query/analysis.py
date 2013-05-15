@@ -13,16 +13,7 @@ class FeatureQuery():
         
     def get_frequency_distribution(self):
         df_dict = self.feature.get_frequency_distribution(filter_function=self.filter_function)
-        """  
-        if self.feature.has_class():
-            df = map(lambda (kv) : [kv[0],kv[1]],df_dict.items())
-        else:
-            
-            df =  {
-                    'categories' : df_dict.keys(),
-                    'series' :  [{ 'name' : self.feature.name, 'data' : df_dict.values() }]
-            }
-        """    
+        
         df =  {
                     'categories' : sorted(df_dict.keys()),
                     'series' :  [{ 'name' : self.feature.name, 'data' : map(lambda (k,v):v,sorted(df_dict.items())) }]

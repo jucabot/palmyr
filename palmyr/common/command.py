@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 import cjson
 import json
+from django.core.cache import cache
 
 def success(**kwargs):
     response = { "status":'success'}
@@ -30,3 +31,7 @@ class Command():
     
     def error(self,message):
         return HttpResponse(cjson.encode({ "status":"error" , "message":"%s" % str(message)}))
+
+    def clear_cache(self):
+        cache.clear()
+        return success(message="Cache cleared")
