@@ -9,7 +9,7 @@ import datetime
 import numpy as np
 from sklearn.svm import SVR
 from sklearn.preprocessing import scale,normalize
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 import math
 from common.datahub import Datahub
 from numpy.ma.core import mean, sqrt
