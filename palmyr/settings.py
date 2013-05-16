@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django_evolution',
+    'django_extensions',
     'analyze',
     'search',
 )
@@ -162,5 +163,5 @@ CONTEXT = {
             #'spark-cluster' : "debug",
             'spark-cluster' : "pool",
             'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
-            'datastore-engine' : "palmyrdb.datastore.memstore.FeatureDataSet",
+            'datastore-engine' : ("datastore.memstore","FeatureDataSet"),
            }
