@@ -20,17 +20,16 @@ urlpatterns = patterns('',
     
     url(r'^datasource/browse$', 'analyze.views.browse_datasource', name='browse-datasource'),
     url(r'^datasource/upload$', 'analyze.views.upload_file', name='upload-datasource'),
+    
     url(r'^analysis/browse$', 'analyze.views.browse_analysis', name='browse-analysis'),
     url(r'^analysis/create$', 'analyze.views.create_analysis', name='create-analysis'),
     url(r'^analysis/open$', 'analyze.views.open_analysis', name='open-analysis'),
     url(r'^analysis/summary$', 'analyze.views.summary_analysis', name='summary-analysis'),
     url(r'^analysis/correlate$', 'analyze.views.correlate_analysis', name='correlate-analysis'),
-    #url(r'^analysis/model$', 'web.views.model_analysis', name='model-analysis'),
+    
     url(r'^api$', 'common.views.api', name='api'),
     url(r'^api/analysis$', 'analyze.views.api', name='analysis-api'),
-    #url(r'^datahub/browse$', 'web.views.browse_datahub', name='browse-datahub'),
-    #url(r'^datahub/show$', 'web.views.show_data', name='show-data'),
-    #url(r'^api$', 'web.api.views.api_general', name='api-general'),
+    
     url(r'^search$', 'search.views.search', name='search'),
     url(r'^api/search$', 'search.views.api', name='search-api'),
 )

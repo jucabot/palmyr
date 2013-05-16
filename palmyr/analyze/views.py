@@ -118,7 +118,7 @@ def create_analysis(request):
     ftable.load_from_csv(datasource_path)
     ftable.params['datasource-path'] = datasource_path
     name = dpath.split(os.sep)[-1]
-    ftable.set_target(ftable.get_features()[0][0]) # define first feature as target
+   
     
     #save feature table in session as user cache
     request.session['feature_tables:'+dpath] = ftable
@@ -193,30 +193,6 @@ def summary_analysis(request):
     else:
         return redirect('browse-analysis')
 
-
-@login_required
-def model_analysis(request):
-    
-    if 'dpath' in request.GET:
-        dpath = request.GET["dpath"]
-        
-        if 'feature_tables:'+dpath in request.session:
-            ftable = request.session['feature_tables:'+dpath]
-        
-            context = {
-            'active_menu' : 'analysis',
-            'dpath': dpath,
-            'name' : dpath.split(os.sep)[-1],
-            'ftable' : ftable,
-            'features' : ftable.get_features(),
-            'tab' : 'model'
-            
-            }
-            return render_to_response('analysis/model.html',context,context_instance=RequestContext(request))
-        else:
-            return redirect('browse-analysis')
-    else:
-        return redirect('browse-analysis')
         
 @login_required
 def correlate_analysis(request):
@@ -257,24 +233,12 @@ def api(request):
             ftable = ctx.get_feature_table(ftname)
             ftcmd = FeatureTableCommand(ctx,ftname,ftable)
             
-            if cmd == 'set-target':
-                return ftcmd.set_target()
-            elif cmd == 'reset-target':
-                return ftcmd.reset_target()
-            elif cmd == 'save':
+            if cmd == 'save':
                 return ftcmd.save()
             elif cmd == 'set-class':
                 return ftcmd.set_class()
             elif cmd == 'get-distribution-function':
                 return ftcmd.get_distribution_function()
-            elif cmd == 'use-feature':
-                return ftcmd.use_feature()
-            elif cmd == 'toggle-feature':
-                return ftcmd.toggle_feature()
-            elif cmd == 'build-model':
-                return ftcmd.build_model()
-            elif cmd == 'save-model':
-                return ftcmd.save_model()
             elif cmd == 'add-feature':
                 return ftcmd.add_feature()
             elif cmd == 'get-feature':
@@ -283,14 +247,6 @@ def api(request):
                 return ftcmd.edit_feature()
             elif cmd == 'remove-feature':
                 return ftcmd.remove_feature()
-            elif cmd == 'select-best-features':
-                return ftcmd.select_best_features()
-            elif cmd == 'get-model-info':
-                return ftcmd.get_model_info()
-            elif cmd == 'get-current-model-info':
-                return ftcmd.get_current_model_info()
-            elif cmd == 'apply-prediction':
-                return ftcmd.apply_prediction()
             elif cmd == 'nl-query':
                 return ftcmd.nl_query()
             elif cmd == 'add-filter':
@@ -303,8 +259,6 @@ def api(request):
                 return ftcmd.remove_filter()
             elif cmd == 'get-featureset':
                 return ftcmd.get_featureset()
-            elif cmd == 'remove-model':
-                return ftcmd.remove_model()
             elif cmd == 'index-query':
                 return ftcmd.index_query()
             else:

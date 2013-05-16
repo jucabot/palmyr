@@ -21,19 +21,7 @@ class FeatureTableCommand(Command):
         self.ftname = ftname
         self.ftable = ftable
 
-    def set_target(self):
-        if 'feature_name' in self.ctx.params:
-            self.ftable.set_target(self.ctx.params['feature_name'])
-            self.ctx.set_feature_table(self.ftname, self.ftable)
-            return self.success()
-        else:
-            return self.error('No feature name defined')
-        
-    def reset_target(self):
-            self.ftable.reset_target()
-            self.ctx.set_feature_table(self.ftname, self.ftable)
-            return self.success()
-
+   
     def set_class(self):
         if 'feature_name' in self.ctx.params:
             is_class = self.ctx.params['is_class'] == 'true'
@@ -76,38 +64,7 @@ class FeatureTableCommand(Command):
             self.ftable.save(self.ctx.get_user_root(base=CONTEXT['analysis-root'])+os.sep + self.ctx.params['dpath'])
             return self.success(message="%s enregistr&eacute; avec succ&egrave;s" % self.ctx.params['dpath'])
     
-    def use_feature(self):
-        if 'feature_name' in self.ctx.params:
-            if 'use_it' in self.ctx.params:
-                self.ftable.use_feature(self.ctx.params['feature_name'],self.ctx.params['use_it']=='true')
-                self.ctx.set_feature_table(self.ftname, self.ftable)
-                return self.success()
-            else:
-                return self.error('No use_it param defined')
-        else:
-            return self.error('No feature name defined')
     
-    def toggle_feature(self):
-        if 'feature_name' in self.ctx.params:
-            fname = self.ctx.params['feature_name']
-            self.ftable.use_feature(fname,not self.ftable.get_feature(fname).is_usable())
-            self.ctx.set_feature_table(self.ftname, self.ftable)
-            return self.success(fname=fname,use=self.ftable.get_feature(fname).is_usable())
-        else:
-            return self.error('No feature name defined')
-    
-        
-    def save_model(self):
-        if self.ftable.current_model is None:
-            (model,model_info) = self.ftable.build_model()
-        else:
-            (model,model_info) = self.ftable.current_model
-            
-        model_name = model_info.name
-        self.ftable.models[model_name] = (model,model_info)
-        self.ctx.set_feature_table(self.ftname, self.ftable)
-
-        return self.success()
     
     def add_feature(self):
         if 'name' not  in self.ctx.params:
@@ -186,75 +143,6 @@ class FeatureTableCommand(Command):
         
         return self.success(message="Feature %s supprim&eacute;e avec succ&grave;s" % name)
     
-    def build_model(self):
-        if 'filter' in self.ctx.params:
-            filter_code = self.ctx.params['filter']
-        else:
-            filter_code = None
-            
-        if 'filter_name' in self.ctx.params:
-            filter_name = self.ctx.params['filter_name']
-        else:
-            filter_name = None
-            
-        
-        model,model_info = self.ftable.build_model(filter_name=filter_name,filter_code=filter_code)
-        self.ftable.current_model = (model,model_info)
-        self.ctx.set_feature_table(self.ftname, self.ftable)
-        return self.success(model_info=model_info.get_properties())
-    
-    
-    def select_best_features(self):
-        if 'filter' in self.ctx.params:
-            filter_code = self.ctx.params['filter']
-        else:
-            filter_code = None
-        
-        kbest = self.ftable.select_best_features(filter_code=filter_code)
-        
-        return self.success(kbest=kbest)
-    
-    def get_model_info(self):
-        if 'name' not  in self.ctx.params:
-            return self.error('No model name defined')
-        name = self.ctx.params['name']
-        
-        if name not in self.ftable.models:
-            return self.error('No model saved as %s' % name)
-        
-        model_info = self.ftable.models[name][1] #model info
-        self.ftable.current_model = self.ftable.models[name]
-        self.ftable.set_target(model_info.target)
-        
-        for (name,feature) in self.ftable.get_features():
-            self.ftable.use_feature(name,name in model_info.selected_features)
-        
-        
-        self.ctx.set_feature_table(self.ftname, self.ftable)
-        
-        return self.success(model_info=model_info.get_properties())
-    
-    def get_current_model_info(self):
-        
-        if self.ftable.current_model is None:
-            return self.success(model_info=None)
-        else:
-            return self.success(model_info=self.ftable.current_model[1].get_properties())
-        
-    def apply_prediction(self):
-        if 'model-name' not  in self.ctx.params:
-            return self.error("model name not defined")
-        if 'input' not  in self.ctx.params:
-            return self.error("input filename not defined")
-        if 'output' not  in self.ctx.params:
-            return self.error("output filename not defined")
-        model_name = self.ctx.params['model-name']
-        input_filename = self.ctx.params['input']
-        output_filename = self.ctx.params['output']
-        
-        self.ftable.apply_prediction(model_name,self.ctx.get_user_root()+os.sep +input_filename,self.ctx.get_user_root()+os.sep +output_filename)
-        
-        return self.success(message="Pr&eacute;dictions sauv&eacute;es dans %s" % output_filename)
 
     def _query(self,query):
         
@@ -385,17 +273,7 @@ class FeatureTableCommand(Command):
     def get_featureset(self):
         return success(data=self.ftable.get_properties())
     
-    def remove_model(self):
-        if 'model' not  in self.ctx.params:
-            return self.error('No model name defined')
-        model_name = self.ctx.params['model']
-        del self.ftable.models[model_name]
-        
-        self.ctx.set_feature_table(self.ftname, self.ftable)
-
-        return self.success()
-    
-    
+   
     def index_query(self):
         if 'query' not  in self.ctx.params:
             return self.error('No query defined')
