@@ -1,5 +1,6 @@
 # Django settings for palmyr project.
 from multiprocessing import cpu_count
+from pyspark.context import SparkContext
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -165,3 +166,9 @@ CONTEXT = {
             'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : ("datastore.memstore","FeatureDataSet"),
            }
+
+if CONTEXT['spark-cluster'] != 'pool' and CONTEXT['spark-cluster'] != 'debug':
+    if not SparkContext._active_spark_context:
+        SPARK_CONTEXT = SparkContext(CONTEXT['spark-cluster'],'inlightd/palmyr')
+    else:
+        SPARK_CONTEXT = SparkContext._active_spark_context
