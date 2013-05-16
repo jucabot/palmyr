@@ -44,19 +44,3 @@ def nlq_parse(query,feature_names):
     feature_x = feature_list[1] if len(feature_list)>1 else None
     
     return feature_y, feature_x,options
-"""        
-print nlq_parse('feature1 by feature2 (filter:"feature1 has value") (page:1) sort:feature2',['feature1', 'feature2'])
-print nlq_parse('feature1 by feature2 (filter:"feature1 \'has value") (page:1) sort:feature2',['feature1', 'feature2'])
-print nlq_parse('feature1 by feature2 (filter:"feature1 \nhas value") (page:1) sort:feature2',['feature1', 'feature2'])
-print nlq_parse('feature1 By feature2',['feature1', 'feature2'])
-print nlq_parse('feature1 par feature2',['feature1', 'feature2'])
-print nlq_parse('feature1 correlated par feature2',['feature1', 'feature2'])
-print nlq_parse('feature1, feature2',['feature1', 'feature2'])
-print nlq_parse('feature1^feature2',['feature1', 'feature2'])
-
-print nlq_parse('feature1 by feature2',['feature1', 'feature2'])
-print nlq_parse('   feature1  (page:1)',['feature1', 'feature2'])
-print nlq_parse('feature1 by Feature2 (filter:"feature1 has value") (page:1) sort:feature2',['feature1', 'feature2'])
-print nlq_parse('(filter:"feature1 has value") (page:1) sort:feature2',['feature1', 'feature2'])
-print nlq_parse('',['feature1', 'feature2'])
-"""
