@@ -167,7 +167,7 @@ def open_analysis(request):
         
     }
     
-    return render_to_response('analysis/correlate.html',context,context_instance=RequestContext(request))
+    return render_to_response('analysis/analysis.html',context,context_instance=RequestContext(request))
 
 
 @login_required
@@ -196,7 +196,7 @@ def summary_analysis(request):
 
         
 @login_required
-def correlate_analysis(request):
+def query_analysis(request):
     
     if 'dpath' in request.GET:
         dpath = request.GET["dpath"]
@@ -212,16 +212,13 @@ def correlate_analysis(request):
             'features' : ftable.get_features(),
             'tab' : 'correlate'
             }
-            return render_to_response('analysis/correlate.html',context,context_instance=RequestContext(request))
+            return render_to_response('analysis/analysis.html',context,context_instance=RequestContext(request))
         else:
             return redirect('browse-analysis')
     else:
         return redirect('browse-analysis')
             
-
-
-
-    
+   
 @login_required
 def api(request):
     

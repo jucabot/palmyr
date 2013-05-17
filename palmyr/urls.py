@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     url(r'^analysis/create$', 'analyze.views.create_analysis', name='create-analysis'),
     url(r'^analysis/open$', 'analyze.views.open_analysis', name='open-analysis'),
     url(r'^analysis/summary$', 'analyze.views.summary_analysis', name='summary-analysis'),
-    url(r'^analysis/correlate$', 'analyze.views.correlate_analysis', name='correlate-analysis'),
+    url(r'^analysis/query$', 'analyze.views.query_analysis', name='query-analysis'),
     
     url(r'^api$', 'common.views.api', name='api'),
     url(r'^api/analysis$', 'analyze.views.api', name='analysis-api'),
