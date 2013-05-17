@@ -164,6 +164,8 @@ CONTEXT = {
             'spark-cluster' : "pool",
             'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
             'datastore-engine' : ("datastore.memstore","FeatureDataSet"),
+            'datastore-path' : "/home/predictiveds/Dropbox/palmyr-data/datastore",
+            
            }
 
 if CONTEXT['spark-cluster'] != 'pool' and CONTEXT['spark-cluster'] != 'debug':

@@ -121,7 +121,7 @@ def create_analysis(request):
    
     
     #save feature table in session as user cache
-    request.session['feature_tables:'+dpath] = ftable
+    request.session['feature_tables:'+dpath] = ftable.save()
     
     ftable.params['name'] = name #dpath name is default name
     
@@ -142,7 +142,7 @@ def open_analysis(request):
     dpath = request.GET["dpath"]
     
     if 'feature_tables:'+dpath in request.session:
-        ftable = request.session['feature_tables:'+dpath]
+        ftable = request.session['feature_tables:'+dpath].load()
     else:
     
         analysis_path = get_user_root(request.user,CONTEXT['analysis-root']) + dpath
@@ -150,10 +150,11 @@ def open_analysis(request):
         #Create feature table from dpath file
         f = open(analysis_path,'rb')
         ftable = load(f)
+        ftable.load()
         f.close()
     
         #save feature table in session as user cache
-        request.session['feature_tables:'+dpath] = ftable
+        request.session['feature_tables:'+dpath] = ftable.save()
     
     name = dpath.split(os.sep)[-1]
     
@@ -176,7 +177,7 @@ def summary_analysis(request):
         dpath = request.GET["dpath"]
         
         if 'feature_tables:'+dpath in request.session:
-            ftable = request.session['feature_tables:'+dpath]
+            ftable = request.session['feature_tables:'+dpath].load()
         
             context = {
             'active_menu' : 'analysis',
@@ -201,7 +202,7 @@ def correlate_analysis(request):
         dpath = request.GET["dpath"]
         
         if 'feature_tables:'+dpath in request.session:
-            ftable = request.session['feature_tables:'+dpath]
+            ftable = request.session['feature_tables:'+dpath].load()
         
             context = {
             'active_menu' : 'analysis',

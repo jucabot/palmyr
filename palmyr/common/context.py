@@ -12,11 +12,13 @@ class UserContext():
         self.params = request.GET
         self.user = request.user
         
-    def get_feature_table(self,ftname):    
-        return self.request.session['feature_tables:'+ftname]
+    def get_feature_table(self,ftname):
+        ftable = self.request.session['feature_tables:'+ftname].load()
+        return ftable
     
-    def set_feature_table(self,ftname,ftable):    
-        self.request.session['feature_tables:'+ftname] = ftable
+    def set_feature_table(self,ftname,ftable):
+            
+        self.request.session['feature_tables:'+ftname] = ftable.save()
 
     def feature_table_exist(self,ftname):
         return 'feature_tables:' + ftname in self.request.session
