@@ -43,22 +43,23 @@ class AnalysisQuery():
     
     def query_as_box_plot(self):
         result = {}
-                       
+        limit = 100
         result['label_x'] =  self.fx.name
         result['label_y'] =  self.fy.name
-        result['categories'] =  self.fx.classes
-        result['series'] = self.fy.get_distribution_stats_by( self.fx,centile=True,filter_function=self.filter_function)
-        
+        result['categories'] =  self.fx.classes if len(self.fx.classes) < limit else self.fx.classes[:limit]
+        series = self.fy.get_distribution_stats_by( self.fx,centile=True,filter_function=self.filter_function)
+        result['series'] = series if len(series) < limit else series[:limit]
         return result
     
     def query_as_scatter_plot(self):
         result = {}
-        
+        limit = 10000
         result['label_x'] = self.fx.name
         result['label_y'] = self.fy.name
+        data = self.fx.get_correlation_with(self.fy,filter_function=self.filter_function)
         result['series'] = [{
                             'name' : self.fx.name + '^' + self.fy.name,
-                            'data' : self.fx.get_correlation_with(self.fy,filter_function=self.filter_function)
+                            'data' : data if len(data) < limit else data[:limit]
                             }]
         return result
     

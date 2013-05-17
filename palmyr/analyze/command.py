@@ -78,7 +78,7 @@ class FeatureTableCommand(Command):
         type_name = self.ctx.params['type']
         
         tc = TypeConverter()
-        if not tc.is_supported_type(type):
+        if not tc.is_supported_type(type_name):
             return self.error('%s type not supported' % type_name)
         
         code = self.ctx.params['code']
@@ -150,8 +150,6 @@ class FeatureTableCommand(Command):
         cached_result = cache.get(self._get_cache_key())
         if cached_result is not None:
             return cached_result
-        
-        
         
         feature_y, feature_x, options = nlq_parse(query,self.ftable.get_feature_names())
         
