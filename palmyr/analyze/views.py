@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
-from forms import UploadFileForm
+
 from django.template.context import RequestContext
 from settings import CONTEXT
 import os
@@ -15,6 +15,7 @@ from command import FeatureTableCommand
 import traceback
 from common.command import error
 from common.context import UserContext
+from common.views import get_path
 
 
 
@@ -26,45 +27,8 @@ def get_user_root(user,root):
         os.makedirs(user_dir)
     return normpath(user_dir)
 
-def handle_uploaded_file(f,filename,user):
-    user_dir = get_user_root(user,CONTEXT['data-root'])
-    
-    path =  user_dir + os.sep +filename
-    destination = open(path, 'wb+')
-    for chunk in f.chunks():
-        destination.write(chunk)
-    destination.close()
-    return path
-    
-@login_required
-def upload_file(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            name = request.FILES['file'].name
-            path = handle_uploaded_file(request.FILES['file'],name,request.user)
-            #file_instance = FileDataSource(name=name.name,path=path)
-            #file_instance.save()
-            
-        path, dirs,files = browse(request,CONTEXT['data-root'])
-        
-        context = {
-            'active_menu' : 'datasource',
-            'path': path,
-            'upload_form' : form,
-            'files' : files,
-            'directories' : dirs,
-        }
-        return render_to_response('datasource/browse.html',context,context_instance=RequestContext(request))
 
 
-def get_path(request):
-    path = "/"
-    if 'path' in request.GET:
-        path = request.GET['path'].replace('.','/')
-    if path == '':
-        path = "/"
-    return path
 
 def browse(request, ROOT):
     
@@ -77,16 +41,13 @@ def browse(request, ROOT):
 
 @login_required
 def browse_datasource(request):
-    form = UploadFileForm()
     
-    path, dirs,files = browse(request,CONTEXT['data-root'])
+    path = get_path(request)
     
     context = {
         'active_menu' : 'datasource',
         'path': path,
-        'upload_form' : form,
-        'files' : files,
-        'directories' : dirs,
+        
     }
     return render_to_response('datasource/browse.html',context,context_instance=RequestContext(request))
 
@@ -259,8 +220,7 @@ def api(request):
                 return ftcmd.get_featureset()
             elif cmd == 'index-query':
                 return ftcmd.index_query()
-            else:
-                return ftcmd.error('Undefined api command %s' % cmd)
+            
         else:
             return error('No feature feature table %s' % ftname)
     except Exception, e:

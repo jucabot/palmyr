@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^accounts/logout_then_login', 'django.contrib.auth.views.logout_then_login',name="logout"),
     
     url(r'^datasource/browse$', 'analyze.views.browse_datasource', name='browse-datasource'),
-    url(r'^datasource/upload$', 'analyze.views.upload_file', name='upload-datasource'),
+    
     
     url(r'^analysis/browse$', 'analyze.views.browse_analysis', name='browse-analysis'),
     url(r'^analysis/create$', 'analyze.views.create_analysis', name='create-analysis'),

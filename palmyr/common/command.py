@@ -32,6 +32,3 @@ class Command():
     def error(self,message):
         return HttpResponse(cjson.encode({ "status":"error" , "message":"%s" % str(message)}))
 
-    def clear_cache(self):
-        cache.clear()
-        return success(message="Cache cleared")
