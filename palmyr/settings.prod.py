@@ -74,7 +74,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/inlightd/palmyrjs/palmyrjs/web/static',
+    '/inlightd/palmyr-app/palmyrjs/web/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -110,7 +110,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/inlightd/palmyrjs/palmyrjs/web/templates',
+    '/inlightd/palmyr-app/palmyrjs/web/templates',
 )
 
 INSTALLED_APPS = (
@@ -158,7 +158,7 @@ CONTEXT = {
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
             'data-root' : "/inlightd/data/data",
-            'analysis-root' : "/inlightd/analytics",
+            'analysis-root' : "/inlightd/data/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",
             #'spark-cluster' : "debug",
             'spark-cluster' : "pool",
