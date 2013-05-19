@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/home/predictiveds/Dropbox/palmyr-data/sqlite.db',                      # Or path to database file if using sqlite3.
+        'NAME': '/inlightd/data/sqlite.db',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -74,7 +74,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/predictiveds/git/palmyrjs/palmyrjs/web/static',
+    '/inlightd/palmyrjs/palmyrjs/web/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -110,7 +110,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/predictiveds/git/palmyrjs/palmyrjs/web/templates',
+    '/inlightd/palmyrjs/palmyrjs/web/templates',
 )
 
 INSTALLED_APPS = (
@@ -124,8 +124,8 @@ INSTALLED_APPS = (
      'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'django_evolution',
-    'django_extensions',
+    #'django_evolution',
+    #'django_extensions',
     'analyze',
     'search',
 )
@@ -157,14 +157,14 @@ CONTEXT = {
             
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
-            'data-root' : "/home/predictiveds/Dropbox/palmyr-data/data",
-            'analysis-root' : "/home/predictiveds/Dropbox/palmyr-data/analytics",
+            'data-root' : "/inlightd/data/data",
+            'analysis-root' : "/inlightd/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",
             #'spark-cluster' : "debug",
             'spark-cluster' : "pool",
-            'correlation-index-path' : "/home/predictiveds/Dropbox/palmyr-data/correlation-search/index.txt",
+            'correlation-index-path' : "/inlightd/data/correlation-search/index.txt",
             'datastore-engine' : ("datastore.memstore","FeatureDataSet"),
-            'datastore-path' : "/home/predictiveds/Dropbox/palmyr-data/datastore",
+            'datastore-path' : "/inlightd/data/datastore",
             
            }
 
