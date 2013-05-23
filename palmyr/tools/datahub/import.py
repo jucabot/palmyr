@@ -91,7 +91,7 @@ def load_wordcloud(filename,index_name,type_name,category,name,zone="France",sep
      "zone": zone,
      "category" : category,
      "source" : source,
-     'description' : description % (name),
+     'description' : unicode(description) % (name),
      "data" : { 'categories': map(lambda item : item[0],categories), 'series': [{'data': map(lambda item : item[1],categories)}]  }
      }
     es.index(index_name, display, serie)
@@ -142,6 +142,6 @@ except:
     pass
 load(IMPORT_DIR + "all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
 load(IMPORT_DIR + "gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
-load_wordcloud(IMPORT_DIR + "word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
+load_wordcloud(IMPORT_DIR + "word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé",u"Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
 load_pie(IMPORT_DIR + "forum_count_full.csv",CONTEXT['datahub-index'],"serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
 load(IMPORT_DIR + "labelled_word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
