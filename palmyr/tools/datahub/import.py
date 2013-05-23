@@ -34,7 +34,7 @@ def load(filename,index_name,type_name,category,zone="France",sep=";",display="t
          "zone": zone,
          "category" : category,
          "source" : source,
-         'description' : description % (key),
+         'description' : description % (unicode(key)),
          "data" : {'series':[{'name': key, 'data':map(lambda (k,v) : [k,v],value.items())}]}
          }
         es.index(index_name, display, serie)
