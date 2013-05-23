@@ -134,10 +134,12 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
     f.close()
 
 
+IMPORT_DIR = '/home/predictiveds/Dropbox/palmyr-data/import datahub/' 
+
 delete_all()
 
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
-load_wordcloud("/home/predictiveds/Dropbox/palmyr-data/import datahub/word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
-load_pie("/home/predictiveds/Dropbox/palmyr-data/import datahub/forum_count_full.csv",CONTEXT['datahub-index'],"serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
-load("/home/predictiveds/Dropbox/palmyr-data/import datahub/labelled_word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
+load(IMPORT_DIR + "all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
+load(IMPORT_DIR + "gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
+load_wordcloud(IMPORT_DIR + "word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
+load_pie(IMPORT_DIR + "forum_count_full.csv",CONTEXT['datahub-index'],"serie",u"Santé",u"Répartition des messages par forums",source="Doctissimo.com",description=u"%s en nombre")
+load(IMPORT_DIR + "labelled_word_series_full.top200.txt",CONTEXT['datahub-index'],"serie",u"Santé",source='Doctissimo',description=u"Evolution mensuelle de l'utilisation du terme %s")
