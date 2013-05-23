@@ -157,6 +157,7 @@ CONTEXT = {
             
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
+            'datahub-import' : '/home/predictiveds/Dropbox/palmyr-data/import/', 
             'data-root' : "/home/predictiveds/Dropbox/palmyr-data/data",
             'analysis-root' : "/home/predictiveds/Dropbox/palmyr-data/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",

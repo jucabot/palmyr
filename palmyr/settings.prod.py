@@ -157,6 +157,7 @@ CONTEXT = {
             
             'datahub-store' : 'http://localhost:9200/',
             'datahub-index' : "datahub",
+            'datahub-import' : '/inlightd/data/import/', 
             'data-root' : "/inlightd/data/data",
             'analysis-root' : "/inlightd/data/analytics",
             #'spark-cluster' : "spark://predictiveds-virtual-machine:7077",

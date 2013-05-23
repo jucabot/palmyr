@@ -134,10 +134,12 @@ def load_pie(filename,index_name,type_name,category,name,zone="France",sep=";",d
     f.close()
 
 
-IMPORT_DIR = '/home/predictiveds/Dropbox/palmyr-data/import datahub/' 
+IMPORT_DIR = CONTEXT['datahub-import']
 
-delete_all()
-
+try:
+    delete_all()
+except:
+    pass
 load(IMPORT_DIR + "all_socio_economic.txt",CONTEXT['datahub-index'],"serie",u"Economie",source='Insee',description=u'Evolution mensuelle de %s')
 load(IMPORT_DIR + "gtrends.txt",CONTEXT['datahub-index'],"serie","Santé",source=u'Google',description=u'Evolution mensuelle des recherches de %s sur Google')
 load_wordcloud(IMPORT_DIR + "word_count_full.txt.top200",CONTEXT['datahub-index'],"serie",u"Santé","Termes les plus utilisés",source=u'Doctissimo.com',description=u'200 %s sur les forums')
