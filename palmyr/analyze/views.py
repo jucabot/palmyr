@@ -8,7 +8,7 @@ from settings import CONTEXT
 import os
 from os import listdir
 from os.path import isfile,isdir, join,normpath
-from palmyrdb.featureset import FeatureTable
+from featuredb.featureset import FeatureTable
 from pickle import load
 from django.contrib.auth.decorators import login_required
 from command import FeatureTableCommand

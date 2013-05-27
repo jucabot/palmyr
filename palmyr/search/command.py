@@ -78,6 +78,9 @@ class SearchCommand(Command):
     def correlate(self):
         
         query = self.ctx.params['query']
+        filters = self.ctx.params.getlist('filters[]')
+        
+        
         (result_type, search_timeserie,total,took) = self._query(query, self.ctx.request.user.id)
         
         start = datetime.datetime.now()

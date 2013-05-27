@@ -1,6 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
-from palmyrdb.converter import INT_TYPE, FLOAT_TYPE, TEXT_TYPE
+from analyze.featuredb.converter import TEXT_TYPE, INT_TYPE, FLOAT_TYPE
 
 register = template.Library()
 

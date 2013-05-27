@@ -3,7 +3,6 @@
 	<name>palmyr</name>
 	<comment></comment>
 	<projects>
-		<project>palmyrdb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

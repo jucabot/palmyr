@@ -2,11 +2,11 @@
 from django.http import HttpResponse
 from settings import CONTEXT
 import os
-from palmyrdb.converter import TEXT_TYPE, TypeConverter
+from featuredb.converter import TEXT_TYPE, TypeConverter
 from query.nlquery import nlq_parse
 from query.analysis import AnalysisQuery, FeatureQuery
 from pickle import dump
-from palmyrdb.script import compile_func_code
+from featuredb.script import compile_func_code
 from common.datahub import Datahub
 from django.core.cache import cache
 from common.command import Command, success

@@ -1,4 +1,4 @@
-from palmyrdb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE,\
+from analyze.featuredb.converter import INT_TYPE, NONE_VALUE, TEXT_TYPE, FLOAT_TYPE,\
     DATE_TYPE
 
 
