@@ -169,6 +169,7 @@ CONTEXT = {
             
            }
 
+SPARK_CONTEXT = None
 if CONTEXT['spark-cluster'] != 'pool' and CONTEXT['spark-cluster'] != 'debug':
     if not SparkContext._active_spark_context:
         SPARK_CONTEXT = SparkContext(CONTEXT['spark-cluster'],'inlightd/palmyr')

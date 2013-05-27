@@ -13,6 +13,7 @@ from multiprocessing import Pool, cpu_count
 import math
 from common.datahub import Datahub
 from numpy.ma.core import mean, sqrt
+from settings import SPARK_CONTEXT
 
 
 def get_date(date_str, date_format="%Y-%m-%d %H:%M:%S"):
@@ -53,7 +54,10 @@ def serie_std(serie):
         std += pow(value - serie_mean, 2)
     std = sqrt(std/(len(serie)-1))
     for value in serie:
-        serie_std.append((value-serie_mean)/std)
+        if std == 0.0:
+            serie_std.append(0.0)
+        else:
+            serie_std.append((value-serie_mean)/std)
     return serie_std
 
 def lag_serie(serie,month_lag):
@@ -195,45 +199,37 @@ class CorrelationSearch():
             print "Spark in multiprocessing pool mode (as multiprocessed map)"
         else:
             self._debug = False
-            self._sc = SparkContext(self.context["spark-cluster"], "Inlight/data Correlation search")
+            self._sc = SPARK_CONTEXT
             self._index_rdd = self._sc.textFile(self.index_file_name)
 
         
-    def search(self, search_timeserie,lag=12,kernel='linear'):
+    def search(self, search_timeserie,filters=[],lag=12,kernel='linear'):
     
-        if self._debug:
+        if self._debug or self._pool:
             lag_variable = broadcast(lag)
             kernel_variable = broadcast(kernel)
             search_timeserie_data = broadcast(transform_serie(search_timeserie))
             
-            result = filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),open(self.index_file_name,mode='r')))
-            
+            if self._debug:
+                result = filter(filter_correlation_results, map(tuple_correlation_search_map,read_index(self.index_file_name,filters,search_timeserie_data,lag_variable,kernel_variable)))
+            else:
+                pool = Pool()
+                result = filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_index(self.index_file_name,filters,search_timeserie_data,lag_variable,kernel_variable)))
+                
+                
             #expand with user series correlation
             dh = Datahub(self.context,user_id=self.user.id)
-            result.extend(filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),dh.get_user_series())))
-            
-            return result
-        elif self._pool:
-            lag_variable = broadcast(lag)
-            kernel_variable = broadcast(kernel)
-            search_timeserie_data = broadcast(transform_serie(search_timeserie))
-            
-            
-            pool = Pool()
-            result = filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_index(self.index_file_name,search_timeserie_data,lag_variable,kernel_variable)))
-            
-            #expand with user series correlation
-            dh = Datahub(self.context,user_id=self.user.id)
-            result.extend(filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_from_list(dh.get_user_series(),search_timeserie_data,lag_variable,kernel_variable))))
-            
-            
+            if self._debug:
+                result.extend(filter(filter_correlation_results, map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable),dh.get_user_series())))
+            else:
+                result.extend(filter(filter_correlation_results, pool.map(tuple_correlation_search_map,read_from_list(dh.get_user_series(),search_timeserie_data,lag_variable,kernel_variable))))
             return result
         else:
             lag_variable = self._sc.broadcast(lag)
             kernel_variable = self._sc.broadcast(kernel)
             search_timeserie_data = self._sc.broadcast(transform_serie(search_timeserie))
             
-            search_result_rdd = self._index_rdd.map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable))
+            search_result_rdd = self._index_rdd.filter(lambda line : line.split(';')[3].strip() not in filters).map(lambda value : correlation_search_map(value,search_timeserie_data,lag_variable,kernel_variable))
             search_result =  search_result_rdd.filter(filter_correlation_results).collect()
             
             pool = Pool()
@@ -262,10 +258,10 @@ class BroadcastVariable():
 def broadcast(value):
     return BroadcastVariable(value)
 
-def read_index(index_file_name,search_timeserie_data,lag_variable,kernel_variable):
+def read_index(index_file_name,filters,search_timeserie_data,lag_variable,kernel_variable):
     f = open(index_file_name,mode='r')
     
-    for line in f:
+    for line in filter(lambda line : line.split(';')[3].strip() not in filters,f):
         yield line,search_timeserie_data,lag_variable,kernel_variable
 
 def read_from_list(iter_list,search_timeserie_data,lag_variable,kernel_variable):

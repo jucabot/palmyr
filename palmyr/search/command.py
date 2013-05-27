@@ -80,12 +80,11 @@ class SearchCommand(Command):
         query = self.ctx.params['query']
         filters = self.ctx.params.getlist('filters[]')
         
-        
         (result_type, search_timeserie,total,took) = self._query(query, self.ctx.request.user.id)
         
         start = datetime.datetime.now()
         cs = CorrelationSearch(CONTEXT,self.ctx.request.user)
-        result = cs.search(search_timeserie['series'][0]['data'])
+        result = cs.search(search_timeserie['series'][0]['data'],filters=filters)
         cs.close()
         
         return self.success(data=result,took=str(datetime.datetime.now()-start))
