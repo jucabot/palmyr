@@ -120,7 +120,10 @@ class FeatureDataSet():
         row_count = 0
         data_columns = {}
         converter = TypeConverter()
-        csv_reader = csv.reader(open(filename, 'rb'))
+        csvfile = open(filename, 'rb')
+        dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        csvfile.seek(0)
+        csv_reader = csv.reader(csvfile,dialect)
         
         headers = csv_reader.next()
         headers_len = len(headers)
@@ -143,6 +146,7 @@ class FeatureDataSet():
             self._dataset[name] = column_values
             column_list.append((name,feature_type))
         
+        csvfile.close()
         self.store()
         
         return column_list
