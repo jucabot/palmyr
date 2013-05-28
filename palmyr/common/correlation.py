@@ -125,27 +125,21 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         (list_key,list_variable, list_predictor) = serie_join(variable.value, lagged_predictor)
         
         
-        if len(list_predictor) < 6:
-            
+        if len(list_predictor) < 6:    
             results[str(i)] = {'r2' : 0}
             continue
         
         
-        y = np.array(list_variable,ndmin=1)
+        y = np.array(serie_std(list_variable),ndmin=1)
         
-        y = serie_std(y)
-
-        X = np.array(list_predictor,ndmin=2)
+        X = np.array(serie_std(list_predictor),ndmin=2)
         X = X.reshape((-1,1))
         
-        X = serie_std(X)
         
         clf = SVR(kernel=kernel_variable.value)
         clf.fit(X, y)
-        
         r_squared = clf.score(X, y)
         
-        #predicted_y = list(svr_rbf.predict(original_X))
         
         
         if r_squared < 0.5:
@@ -157,10 +151,6 @@ def correlation_search_map(line,variable,lag_variable,kernel_variable):
         
         result["r2"] = r_squared
         
-        
-        #result["y"] = list_variable
-        #result["x"] = list_predictor
-        #result["predicted_y"] = predicted_y
         
         results[str(i)] = result
 
